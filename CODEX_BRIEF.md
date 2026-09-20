@@ -2,6 +2,24 @@
 
 Bu dosya, ChatGPT ile yapılan ürün/tasarım kararlarını Codex'e devretmek için hazırlanmıştır. Amaç projeyi mevcut prototipten gerçek, profesyonel bir V1 ürüne taşımaktır.
 
+## Görsel Referanslar — ÖNCELİKLİ
+
+Codex yalnızca bu metne göre serbest tasarım üretmemeli. Repo içindeki görsel referansları açıp inceleyerek UI'ı bunlara yaklaştırmalıdır.
+
+- `design-reference/reference-board.jpg` — konuşma boyunca beğenilen marka, öğretmen/veli ekranları, balık çeşitliliği, sınıf başarısına bağlı dekorasyon ve geniş/tam ekran akvaryum tasarımlarının toplu referans panosu.
+- `design-reference/brand-guide.jpg` — logo, renk paleti, tipografi, uygulama ikonu ve marka dili için ana görsel referans.
+
+### Görsel uyum talimatı
+- Bu görseller sadece ilham değil, ürünün kabul edilmiş tasarım yönüdür.
+- Genel kompozisyon, renk dili, kart yapıları, deniz atmosferi, illüstrasyon kalitesi ve akvaryum yoğunluğu bu referanslara yakın olmalıdır.
+- Basit emoji, generic icon-only aquarium veya düz gradient kutu kullanma.
+- Balıklar özgün, sevimli, yüksek kaliteli 2D/3D-illüstratif assetler olmalı.
+- Akvaryum ana vitrin ekranıdır; referans panosundaki geniş, canlı, derinlikli, mercan/dekor zenginliği olan görsel kalite hedeflenmelidir.
+- Öğretmen paneli ve veli panelinde beyaz/çok açık zemin, mavi-turkuaz marka renkleri, yumuşak gölge ve yuvarlatılmış kart dili korunmalıdır.
+- Referans görsellerindeki üçüncü taraf karakterlere benzeyen detayları birebir kopyalama; aynı sıcaklık ve sinematik deniz hissini özgün assetlerle üret.
+
+Codex işe başlamadan önce bu iki görsel dosyayı mutlaka incelemeli ve kendi uygulamasını ekran ekran onlarla karşılaştırmalıdır.
+
 ## Ürün Özeti
 
 **Ürün adı:** SınıfDenizi  
