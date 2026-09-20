@@ -9,6 +9,21 @@ Codex yalnızca bu metne göre serbest tasarım üretmemeli. Repo içindeki gör
 - `design-reference/reference-board.jpg` — konuşma boyunca beğenilen marka, öğretmen/veli ekranları, balık çeşitliliği, sınıf başarısına bağlı dekorasyon ve geniş/tam ekran akvaryum tasarımlarının toplu referans panosu.
 - `design-reference/brand-guide.jpg` — logo, renk paleti, tipografi, uygulama ikonu ve marka dili için ana görsel referans.
 
+### UI uygulamasından önce zorunlu inceleme
+
+Codex, herhangi bir UI uygulamasına veya yeniden tasarımına başlamadan önce aşağıdaki altı yüksek çözünürlüklü referans dosyasının tamamını açıp görsel olarak incelemelidir:
+
+- `design-reference/01-brand-guide.jpg` — marka, logo, renk paleti ve tipografi.
+- `design-reference/02-core-ui-flow.jpg` — temel ekranlar ve arayüz akışı.
+- `design-reference/03-fish-variety.jpg` — balık türleri, siluetleri, modelleme ve asset kalitesi.
+- `design-reference/04-class-success-decor.jpg` — sınıf başarısına bağlı dekorasyon gelişimi.
+- `design-reference/05-wide-fullscreen-aquarium.jpg` — geniş, derinlikli ve tam ekran akvaryum düzeni.
+- `design-reference/06-teacher-parent-product.jpg` — öğretmen ve veli ürün ekranları.
+
+Bu altı dosya ana görsel referanslardır; yalnızca dosya adlarını veya bu brief'i okumak yeterli değildir. Balıkların gövde, yüzgeç, kuyruk, desen ve tür bazındaki farklılıklarını özellikle üçüncü referansa göre özgün ve profesyonel kalitede modelle. Uygulanan ekranları ilgili referanslarla görsel olarak karşılaştır.
+
+Dosyalardan herhangi biri eksikse veya açılamıyorsa eksik yolu açıkça bildir; tüm referanslar erişilebilir olup incelenmeden UI uygulamasına başlama. Mevcut `design-reference/reference-board.jpg` ve `design-reference/brand-guide.jpg` dosyalarını koru ve ek referans olarak incele; bunlar altı ayrı dosyanın yerine geçmez.
+
 ### Görsel uyum talimatı
 - Bu görseller sadece ilham değil, ürünün kabul edilmiş tasarım yönüdür.
 - Genel kompozisyon, renk dili, kart yapıları, deniz atmosferi, illüstrasyon kalitesi ve akvaryum yoğunluğu bu referanslara yakın olmalıdır.
@@ -18,7 +33,7 @@ Codex yalnızca bu metne göre serbest tasarım üretmemeli. Repo içindeki gör
 - Öğretmen paneli ve veli panelinde beyaz/çok açık zemin, mavi-turkuaz marka renkleri, yumuşak gölge ve yuvarlatılmış kart dili korunmalıdır.
 - Referans görsellerindeki üçüncü taraf karakterlere benzeyen detayları birebir kopyalama; aynı sıcaklık ve sinematik deniz hissini özgün assetlerle üret.
 
-Codex işe başlamadan önce bu iki görsel dosyayı mutlaka incelemeli ve kendi uygulamasını ekran ekran onlarla karşılaştırmalıdır.
+Codex UI uygulamasına başlamadan önce yukarıdaki altı ana referansı ve mevcut iki ek referansı mutlaka incelemeli ve kendi uygulamasını ekran ekran onlarla karşılaştırmalıdır.
 
 ## Ürün Özeti
 
