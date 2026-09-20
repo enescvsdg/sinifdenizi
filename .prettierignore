@@ -1,0 +1,7 @@
+node_modules
+.next
+package-lock.json
+legacy
+CODEX_BRIEF.md
+test-results
+playwright-report
