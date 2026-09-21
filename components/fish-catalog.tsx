@@ -9,6 +9,7 @@ import {
   filterSpecies,
   isSpeciesUnlocked,
   speciesFilters,
+  speciesDefinitions,
   type SpeciesFilter,
 } from "@/lib/species";
 import "@/app/fish-catalog.css";
@@ -66,7 +67,7 @@ export function FishPicker({
         })}
       </div>
       {!fish.length && <p className="species-empty" role="status">Bu aramada bir deniz arkadaşı bulunamadı.</p>}
-      <p className="species-footnote"><Lock size={13} /> Özel canlılar öğrencinin toplam XP puanıyla açılır. Görseli hazırlanan türler henüz seçilemez. <span>{fish.length} tür gösteriliyor</span></p>
+      <p className="species-footnote"><Lock size={13} /> Özel canlılar öğrencinin toplam XP puanıyla açılır. {speciesDefinitions.some((item) => !item.available) && "Görseli hazırlanan türler henüz seçilemez."} <span>{fish.length} tür gösteriliyor</span></p>
     </div>
   );
 }
@@ -83,7 +84,7 @@ export default function FishCatalog({ students, onAssign }: {
       <div className="catalog-heading">
         <div><span className="eyebrow">DENİZİMİZİN SAKİNLERİ</span><h2 id="fish-catalog-title">Balık seçenekleri</h2>
           <p>Her öğrenciye bir deniz arkadaşı. Başarılarıyla yeni türlerin kilidini açın.</p></div>
-        <span className="catalog-species-count"><Sparkles size={16} /> 30 tür · 12 hazır</span>
+        <span className="catalog-species-count"><Sparkles size={16} /> {speciesDefinitions.length} tür · {speciesDefinitions.filter((item) => item.available).length} hazır</span>
       </div>
       <div className="catalog-student-row">
         <label htmlFor={selectId}>Deniz arkadaşını seçtiğin öğrenci

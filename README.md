@@ -25,7 +25,10 @@ npm start
 ## Bu aşamada çalışanlar
 
 - Akvaryum merkezli öğretmen arayüzü; mobil ve akıllı tahta düzeni.
-- 12 özgün deniz canlısı, üç derinlik katmanı, bağımsız hızlar, yakınlıkla kaçınma ve doğal kenar dönüşleri.
+- 30 tür için özgün deniz canlısı çizimleri; üç derinlik katmanı, bağımsız hızlar, yakınlıkla kaçınma ve doğal kenar dönüşleri.
+- Aranabilir ve filtrelenebilir balık kataloğu; 27 temel tür ve öğrencinin kendi XP'siyle açılan üç özel tür: Altın balık 500 XP, Gökkuşağı 1.500 XP, Karanlık 3.000 XP.
+- Yeni örnek sınıfta 24 farklı temel tür; mevcut `sinifdenizi-v2` kayıtlarında öğrenci seçimi ve tür ID'leri korunur.
+- Yüzey ışığı, hareketli su yansımaları, mercan/yosun salınımı, küçük ortam sürüleri ve türe göre yüzme rotaları.
 - Duraklatma, azaltılmış hareket tercihi, tam ekran ve klavye ile öğrenci seçimi.
 - Öğrenci ekleme, yerel fotoğraf, arama, profil ve balık değiştirme; 40 öğrenci sınırı.
 - Tüm sınıfa veya seçilen öğrencilere görev atama, öğrenci bazında tek seferlik onay, XP ve yem ödülleri.
@@ -35,22 +38,23 @@ npm start
 
 ## Açık sınırlar
 
-Canlı deniz güncellemesi: yüzey ışığı, hareketli su yansımaları, mercan/yosun salınımı, küçük balık sürüleri ve türe göre yüzme davranışları eklendi. Duraklatma ve azaltılmış hareket tercihi tüm hareket katmanlarını birlikte durdurur.
-
-Balık kataloğu 30 türü listeler; şu an 12 türün çizimi hazır ve seçilebilir. Kalan 18 türün kartları “Görsel hazırlanıyor” olarak gösterilir ve seçilemez. Eksik türlerin yerine başka balık çizimi kullanılmaz. Yeni, özgün karakter tasarımları ayrı bir sonraki aşamadır.
+30 türün tamamının çizimi hazırdır. Görseller `public/assets/creatures-original-01.png` ile `creatures-original-05.png` arasındaki beş adet 1.536 × 1.024 piksel RGBA atlasında yer alır. Her atlas, 3 × 2 düzende altı tür içerir. Özel türlerin seçilememesi eksik görselden değil, öğrencinin XP koşulundan kaynaklanır. Yeni çizimler mevcut deniz hareketlerini, duraklatmayı ve azaltılmış hareket tercihini korur.
 
 Bu bir **çalışan görsel ürün demosudur**, üretim sistemi değildir. Örnek veriler tarayıcıdaki `sinifdenizi-v2` kaydında saklanır. Gerçek kimlik doğrulama, Supabase bağlantısı, sunucuda öğretmen/veli yetkilendirmesi ve özel fotoğraf depolama henüz bağlı değildir. Rol geçişi yalnızca demo gezintisidir; güvenlik sınırı değildir. Gerçek öğrenci verileri kullanmayın. Eski prototipin kayıtları sessizce taşınmaz veya silinmez; `legacy/index.html` içinde eski prototip korunmuştur.
 
-Balıklar yüksek kaliteli 2D sprite çizimleridir; ayrı yüzgeç/kuyruk iskelet animasyonları henüz yoktur. Kaçınma yumuşak bir hareket kuralıdır; yoğun gruplarda görsel örtüşmeler olabilir. Küçük ekranda tam ekran seçeneği kullanılabilir.
+Balıklar tek pozlu 2D sprite çizimleridir. Mevcut hareket, bütün gövdenin türüne uygun rotada ilerlemesi ve CSS salınımlarıyla sağlanır; ayrı yüzgeç/kuyruk iskelet animasyonları veya kare kare uzuv döngüleri henüz yoktur. 26 numaralı Renkli sürüler tek bileşik çizimdir; bu çizimin içindeki balıklar bağımsız hareket etmez. Akvaryumdaki dekoratif ortam sürüleri ayrı bir hareket katmanıdır. Kaçınma yumuşak bir hareket kuralıdır; yoğun gruplarda görsel örtüşmeler olabilir. Küçük ekranda tam ekran seçeneği kullanılabilir.
 
 ## Yapı
 
 - `app/`: sayfa ve duyarlı tasarım sistemi.
 - `components/`: ekranlar, formlar, diyalog ve akvaryum.
 - `lib/model.ts`: tipler, ödüller ve ilerleme hesapları.
+- `lib/species.ts`: 30 sabit tür ID'si, katalog filtreleri ve öğrenci XP kilitleri.
+- `lib/creature-art.ts`: atlas dosyaları ve türlerin görsel alanları.
 - `lib/swimming.ts`: zamana dayalı hareket ve kaçınma motoru.
 - `public/assets/`: yeni, özgün PNG ortam ve sprite atlasları.
 - `design-reference/`: altı ana referans ve korunmuş eski iki dosya.
+- `docs/ORIGINAL_CREATURE_BRIEF.md`: özgün karakter tasarım hedefleri, atlas teslim durumu ve ileride hazırlanacak uzuv animasyonları.
 - `tests/`: ödül bütünlüğü, veri doğrulama, 40 balık testi ve tarayıcı akışları.
 
 ## Tarayıcı kontrolü
@@ -58,3 +62,5 @@ Balıklar yüksek kaliteli 2D sprite çizimleridir; ayrı yüzgeç/kuyruk iskele
 Uygulama 4173 portunda çalışırken `npm run test:e2e` çalıştırın. Varsayılan tarayıcı yerel Microsoft Edge'dir. Playwright Chromium için `BROWSER_CHANNEL=chromium` kullanın. `APP_URL` ve `SCREENSHOT_DIR` ile adresi ve ekran görüntüsü klasörünü değiştirebilirsiniz. Test ayrı bir tarayıcı profili kullanır, kullanıcının tarayıcısına dokunmaz.
 
 Görsel üretim yöntemi ve promptlar `ASSET_NOTES.md` içindedir.
+
+Çekiçbaş köpekbalığı (ID 13), baş biçimini belirginleştirmek için ayrıca üretilen `public/assets/creature-hammerhead-original.png` dosyasını kullanır (1536 × 1024, RGBA). Üçüncü atlasın ilk çizimi dosyada korunur ancak bu türün görünümünde kullanılmaz.

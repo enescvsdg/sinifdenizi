@@ -51,7 +51,7 @@ test("local state validates malformed and unsupported saves", () => {
   assert.equal(validState(s), false);
 });
 test("40 swimmers remain finite and inside the aquarium through long pauses", () => {
-  const fish = createSwimmers(40);
+  const fish = createSwimmers(40, Array.from({ length: 40 }, (_, i) => i % 30));
   for (let i = 0; i < 10000; i++)
     stepSwimmers(fish, i === 500 ? 100 : 1 / 60, i / 60);
   for (const f of fish) {
