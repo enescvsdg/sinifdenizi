@@ -1,17 +1,5 @@
-export const species = [
-  "Palyaço balığı",
-  "Mavi tang",
-  "Sarı tang",
-  "Kelebek balığı",
-  "Aslan balığı",
-  "Balon balığı",
-  "Denizatı",
-  "Manta vatoz",
-  "Deniz kaplumbağası",
-  "Köpekbalığı",
-  "Ahtapot",
-  "Denizanası",
-];
+import { canChooseSpecies, speciesDefinitions } from "./species.ts";
+export { species } from "./species.ts";
 export const decorNames = [
   "Deniz bitkileri",
   "Mavi kayalar",
@@ -236,7 +224,7 @@ export function validState(value: unknown): value is SchoolState {
         typeof x.name === "string" &&
         Number.isInteger(x.fish) &&
         x.fish >= 0 &&
-        x.fish < 12 &&
+        x.fish < speciesDefinitions.length &&
         Number.isFinite(x.xp) &&
         x.xp >= 0 &&
         Number.isFinite(x.feed) &&
@@ -260,4 +248,13 @@ export function validState(value: unknown): value is SchoolState {
     Array.isArray(s.activities) &&
     typeof s.note === "string"
   );
+}
+
+export function assignStudentFish(s: SchoolState, studentId: string, fish: number): SchoolState {
+  const student = s.students.find((entry) => entry.id === studentId);
+  if (!student || student.fish === fish || !canChooseSpecies(fish, student.xp)) return s;
+  return {
+    ...s,
+    students: s.students.map((entry) => entry.id === studentId ? { ...entry, fish } : entry),
+  };
 }

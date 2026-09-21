@@ -26,8 +26,9 @@ export function Fish({
   className?: string;
   style?: CSSProperties;
 }) {
-  const bounds = fishBounds[type] || fishBounds[0];
+  const bounds = fishBounds[type];
   const clip = useId();
+  if (!bounds) return null;
   const shape =
     type === 6
       ? "797,330 1049,330 1049,480 1000,500 1000,687 797,687"

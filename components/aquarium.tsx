@@ -1,17 +1,13 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Expand, Minimize, Pause, Play, MousePointer2, X } from "lucide-react";
 import { Student, level, decorThresholds } from "@/lib/model";
-import { createSwimmers, stepSwimmers } from "@/lib/swimming";
+import { createSwimmers, stepSwimmers, swimProfile, type Swimmer } from "@/lib/swimming";
 import { Fish, Decor, asset } from "./sprites";
-export default function Aquarium({
-  students,
-  decorations,
-  xp,
-  onSelect,
-  feeding = 0,
-  compact = false,
-}: {
+import { OceanAtmosphere } from "./ocean-atmosphere";
+import "@/app/ocean-motion.css";
+
+export default function Aquarium({ students, decorations, xp, onSelect, feeding = 0, compact = false }: {
   students: Student[];
   decorations: number[];
   xp: number;
@@ -19,176 +15,153 @@ export default function Aquarium({
   feeding?: number;
   compact?: boolean;
 }) {
-  const root = useRef<HTMLDivElement>(null),
-    nodes = useRef<(HTMLButtonElement | null)[]>([]);
-  const [paused, setPaused] = useState(false),
-    [full, setFull] = useState(false),
-    [hover, setHover] = useState<string | null>(null),
-    [food, setFood] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  const nodes = useRef(new Map<string, HTMLButtonElement>());
+  const swimmers = useRef<(Swimmer & { id: string })[]>([]);
+  const elapsed = useRef(0);
+  const aspect = useRef(1.65);
+  const foodRemaining = useRef(0);
+  const [paused, setPaused] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [full, setFull] = useState(false);
+  const [hover, setHover] = useState<string | null>(null);
+  const [food, setFood] = useState(false);
+  const stopped = paused || reducedMotion || hidden;
+
   useEffect(() => {
-    if (!feeding) return;
-    setFood(true);
-    const t = setTimeout(() => setFood(false), 2600);
-    return () => clearTimeout(t);
-  }, [feeding]);
-  useEffect(() => {
-    const handler = () => setFull(document.fullscreenElement === root.current);
-    document.addEventListener("fullscreenchange", handler);
-    return () => document.removeEventListener("fullscreenchange", handler);
-  }, []);
+    const previous = new Map(swimmers.current.map((fish) => [fish.id, fish]));
+    const starts = createSwimmers(students.length, students.map((s) => s.fish));
+    swimmers.current = students.map((s, i) => ({ ...(previous.get(s.id) || starts[i]), id: s.id, species: s.fish }));
+  }, [students]);
+
   useEffect(() => {
     const media = matchMedia("(prefers-reduced-motion: reduce)");
-    const fish = createSwimmers(students.length);
-    let frame = 0,
-      last = 0;
+    const preference = () => setReducedMotion(media.matches);
+    const visibility = () => setHidden(document.hidden);
+    preference();
+    visibility();
+    media.addEventListener("change", preference);
+    document.addEventListener("visibilitychange", visibility);
+    const size = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      aspect.current = width / Math.max(1, height);
+      root.current?.style.setProperty("--ocean-width", `${width}px`);
+      root.current?.style.setProperty("--ocean-height", `${height}px`);
+    });
+    if (root.current) size.observe(root.current);
+    return () => {
+      media.removeEventListener("change", preference);
+      document.removeEventListener("visibilitychange", visibility);
+      size.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!feeding) return;
+    foodRemaining.current = 2600;
+    setFood(true);
+  }, [feeding]);
+  useEffect(() => {
+    if (!food || stopped) return;
+    const started = performance.now();
+    const timer = window.setTimeout(() => setFood(false), foodRemaining.current);
+    return () => {
+      clearTimeout(timer);
+      foodRemaining.current = Math.max(0, foodRemaining.current - (performance.now() - started));
+    };
+  }, [food, feeding, stopped]);
+
+  useEffect(() => {
+    let frame = 0;
+    let last: number | null = null;
+    const draw = () => swimmers.current.forEach((f) => {
+      const el = nodes.current.get(f.id);
+      if (!el) return;
+      el.style.left = `${f.x * 100}%`;
+      el.style.top = `${f.y * 100}%`;
+      el.style.setProperty("--depth", String(4 + f.depth));
+      el.style.setProperty("--direction", String(f.facing));
+      el.style.setProperty("--scale", String(0.68 + f.depth * 0.15));
+      el.style.setProperty("--tilt", `${Math.max(-8, Math.min(8, f.vy * 180))}deg`);
+    });
     const paint = (now: number) => {
-      const dt = last ? (now - last) / 1000 : 0;
+      // No hidden-tab catch-up and no simulation reset when pausing/resuming.
+      const dt = last === null ? 0 : Math.min((now - last) / 1000, 0.04);
       last = now;
-      if (!paused && !media.matches && !document.hidden)
-        stepSwimmers(fish, dt, now / 1000);
-      fish.forEach((f, i) => {
-        const el = nodes.current[i];
-        if (!el) return;
-        el.style.left = `${f.x * 100}%`;
-        el.style.top = `${f.y * 100}%`;
-        el.style.zIndex = String(4 + f.depth);
-        el.style.setProperty("--direction", String(f.vx < 0 ? -1 : 1));
-        el.style.setProperty("--scale", String(0.67 + f.depth * 0.15));
-        el.style.setProperty(
-          "--tilt",
-          `${Math.max(-9, Math.min(9, f.vy * 200))}deg`,
-        );
-      });
+      if (!document.hidden) {
+        elapsed.current += dt;
+        stepSwimmers(swimmers.current, dt, elapsed.current, aspect.current);
+        draw();
+      }
       frame = requestAnimationFrame(paint);
     };
-    frame = requestAnimationFrame(paint);
+    draw();
+    if (!stopped) frame = requestAnimationFrame(paint);
     return () => cancelAnimationFrame(frame);
-  }, [students.length, paused]);
-  async function fullscreen() {
-    if (document.fullscreenElement) {
-      await document.exitFullscreen();
-      return;
-    }
-    try {
-      await root.current?.requestFullscreen();
-    } catch {
-      setFull(!full);
-    }
-  }
+  }, [stopped, students]);
+
   useEffect(() => {
-    const esc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setFull(false);
-    };
+    const handler = () => setFull(document.fullscreenElement === root.current);
+    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setFull(false); };
+    document.addEventListener("fullscreenchange", handler);
     window.addEventListener("keydown", esc);
-    return () => window.removeEventListener("keydown", esc);
+    return () => {
+      document.removeEventListener("fullscreenchange", handler);
+      window.removeEventListener("keydown", esc);
+    };
   }, []);
+  async function fullscreen() {
+    if (document.fullscreenElement) { await document.exitFullscreen(); return; }
+    if (full) { setFull(false); return; }
+    try {
+      if (!root.current?.requestFullscreen) { setFull(true); return; }
+      await root.current.requestFullscreen();
+    } catch { setFull(true); }
+  }
+
   return (
-    <div
-      ref={root}
-      className={`aquarium ${compact ? "compact" : ""} ${full ? "expanded" : ""}`}
-      style={{ backgroundImage: `url(${asset("aquarium.png")})` }}
-    >
+    <div ref={root} className={`aquarium living-ocean ${compact ? "compact" : ""} ${full ? "expanded" : ""}`}
+      data-motion={stopped ? "paused" : "running"}
+      style={{ backgroundImage: `url(${asset("aquarium.png")})` }}>
       <div className="aquarium-caption">
-        <span className="live-dot" /> CANLI SINIF DENİZİ{" "}
-        <span className="aquarium-caption-separator">/</span> {students.length}{" "}
-        arkadaş, bir deniz
+        <span className="live-dot" /> CANLI SINIF DENİZİ <span className="aquarium-caption-separator">/</span> {students.length} arkadaş, bir deniz
       </div>
-      <div className="water-rays" />
-      {Array.from({ length: 16 }, (_, i) => (
-        <i
-          key={i}
-          className={`bubble ${paused ? "paused" : ""}`}
-          style={{
-            left: `${(i * 17 + 7) % 100}%`,
-            width: 4 + (i % 4) * 3,
-            height: 4 + (i % 4) * 3,
-            animationDelay: `-${i * 1.7}s`,
-            animationDuration: `${11 + (i % 5)}s`,
-          }}
-        />
+      <OceanAtmosphere compact={compact} />
+      {decorations.filter((x) => xp >= decorThresholds[x]).map((d, i) => (
+        <Decor key={d} type={d}
+          className={`scene-decor ${d === 0 ? "living-kelp" : d === 2 ? "living-coral" : d === 7 ? "living-jelly" : ""}`}
+          style={{ left: `${4 + ((i * 17) % 82)}%`, width: d === 4 ? "23%" : "15%", bottom: d === 7 ? "19%" : "-1%", zIndex: 2, animationDelay: `-${i * 2.3}s` }} />
       ))}
-      {decorations
-        .filter((x) => xp >= decorThresholds[x])
-        .map((d, i) => (
-          <Decor
-            key={d}
-            type={d}
-            className="scene-decor"
-            style={{
-              left: `${4 + ((i * 17) % 82)}%`,
-              width: d === 4 ? "23%" : "15%",
-              bottom: d === 7 ? "19%" : "-1%",
-              zIndex: 2,
-            }}
-          />
-        ))}
       {students.map((s, i) => (
-        <button
-          key={s.id}
-          ref={(el) => {
-            nodes.current[i] = el;
-          }}
-          className="swimmer"
+        <button key={s.id} ref={(el) => { if (el) nodes.current.set(s.id, el); else nodes.current.delete(s.id); }}
+          className="swimmer" data-species={s.fish}
           aria-label={`${s.name}, ${level(s.xp)}. seviye, öğrenci kartını aç`}
-          onClick={() => onSelect(s)}
-          onMouseEnter={() => setHover(s.id)}
-          onMouseLeave={() => setHover(null)}
-          onFocus={() => setHover(s.id)}
-          onBlur={() => setHover(null)}
-          style={{
-            width: compact ? "12%" : students.length > 30 ? "8%" : "10%",
-            animationDelay: `-${i}s`,
-          }}
-        >
-          <Fish type={s.fish} />
-          {hover === s.id && (
-            <span className="fish-label">
-              {s.name}
-              <small>Seviye {level(s.xp)}</small>
-            </span>
-          )}
+          onClick={() => onSelect(s)} onMouseEnter={() => setHover(s.id)} onMouseLeave={() => setHover(null)}
+          onFocus={() => setHover(s.id)} onBlur={() => setHover(null)}
+          style={{ width: compact ? "12%" : students.length > 30 ? "8%" : "10%", "--swim-delay": `-${i * 0.7}s` } as CSSProperties}>
+          <span className={`swimmer-body swim-${swimProfile(s.fish).style}`}><Fish type={s.fish} /></span>
+          {hover === s.id && <span className="fish-label">{s.name}<small>Seviye {level(s.xp)}</small></span>}
         </button>
       ))}
-      {food &&
-        Array.from({ length: 30 }, (_, i) => (
-          <i
-            key={i}
-            className="food"
-            style={{
-              left: `${10 + ((i * 19) % 80)}%`,
-              animationDelay: `${(i % 7) * 0.12}s`,
-            }}
-          />
-        ))}
+      {food && Array.from({ length: 30 }, (_, i) => (
+        <i key={`${feeding}-${i}`} className="food" aria-hidden="true"
+          style={{ left: `${10 + ((i * 19) % 80)}%`, animationDelay: `${(i % 7) * 0.12}s` }} />
+      ))}
       <div className="aquarium-bottom">
-        <span>
-          <MousePointer2 size={14} /> Bir balığa dokun, hikâyesini keşfet
-        </span>
+        <span><MousePointer2 size={14} /> Bir balığa dokun, hikâyesini keşfet</span>
         <div>
-          <button
-            aria-label={paused ? "Yüzmeyi sürdür" : "Yüzmeyi duraklat"}
-            onClick={() => setPaused(!paused)}
-          >
-            {paused ? <Play size={17} /> : <Pause size={17} />}
+          <button aria-label={paused ? "Yüzmeyi sürdür" : "Yüzmeyi duraklat"} aria-pressed={paused}
+            title={reducedMotion ? "Cihazınızın azaltılmış hareket tercihi açık" : paused ? "Denizdeki hareketi sürdür" : "Denizdeki tüm hareketi duraklat"}
+            onClick={() => setPaused(!paused)}>
+            {paused || reducedMotion ? <Play size={17} /> : <Pause size={17} />}
           </button>
-          <button
-            onClick={fullscreen}
-            aria-label={full ? "Tam ekrandan çık" : "Tam ekran"}
-          >
-            {full ? <Minimize size={17} /> : <Expand size={17} />}
-            <span>{full ? "Küçült" : "Tam ekran"}</span>
+          <button onClick={fullscreen} aria-label={full ? "Tam ekrandan çık" : "Tam ekran"}>
+            {full ? <Minimize size={17} /> : <Expand size={17} />}<span>{full ? "Küçült" : "Tam ekran"}</span>
           </button>
         </div>
       </div>
-      {full && (
-        <button
-          className="fullscreen-exit icon-button"
-          aria-label="Tam ekrandan çık"
-          onClick={fullscreen}
-        >
-          <X />
-        </button>
-      )}
+      {full && <button className="fullscreen-exit icon-button" aria-label="Tam ekrandan çık" onClick={fullscreen}><X /></button>}
     </div>
   );
 }

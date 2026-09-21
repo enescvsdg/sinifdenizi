@@ -32,11 +32,13 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import Aquarium from "./aquarium";
+import FishCatalog, { FishPicker } from "./fish-catalog";
 import Modal from "./modal";
 import { StudentForm, TaskForm } from "./forms";
 import { Fish, Decor, asset } from "./sprites";
 import {
   initialState,
+  assignStudentFish,
   validState,
   approveTask,
   feedStudents,
@@ -580,35 +582,7 @@ export default function SchoolApp() {
                           </div>
                         </aside>
                       </div>
-                      <section className="card collection-card">
-                        <div className="section-heading">
-                          <div>
-                            <span className="eyebrow">
-                              DENİZİMİZİN SAKİNLERİ
-                            </span>
-                            <h2>Her biri başka bir hikâye.</h2>
-                          </div>
-                          <button
-                            className="text-button"
-                            onClick={() => navigate("students")}
-                          >
-                            Tüm öğrenciler <ArrowUpRight size={17} />
-                          </button>
-                        </div>
-                        <div className="fish-collection">
-                          {state.students.slice(0, 8).map((s) => (
-                            <button
-                              key={s.id}
-                              className="collection-fish"
-                              onClick={() => setSelected(s.id)}
-                            >
-                              <Fish type={s.fish} />
-                              <strong>{s.name.split(" ")[0]}</strong>
-                              <small>{species[s.fish]}</small>
-                            </button>
-                          ))}
-                        </div>
-                      </section>
+                      <FishCatalog students={state.students} onAssign={(id, fish) => setState((s) => assignStudentFish(s, id, fish))} />
                     </>
                   )}
                   {page === "students" && (
@@ -1250,26 +1224,7 @@ export default function SchoolApp() {
           {role === "teacher" && (
             <>
               <h3>Deniz arkadaşını seç</h3>
-              <div className="fish-picker">
-                {species.map((name, i) => (
-                  <button
-                    key={name}
-                    aria-label={name}
-                    className={current.fish === i ? "selected" : ""}
-                    onClick={() =>
-                      setState((s) => ({
-                        ...s,
-                        students: s.students.map((st) =>
-                          st.id === current.id ? { ...st, fish: i } : st,
-                        ),
-                      }))
-                    }
-                  >
-                    <Fish type={i} />
-                    <small>{name}</small>
-                  </button>
-                ))}
-              </div>
+              <FishPicker selected={current.fish} xp={current.xp} compact onSelect={(fish) => setState((s) => assignStudentFish(s, current.id, fish))} />
             </>
           )}
         </Modal>

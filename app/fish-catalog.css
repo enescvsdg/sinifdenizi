@@ -1,0 +1,63 @@
+.fish-catalog { margin-top: 26px; padding: 24px; background: linear-gradient(160deg, #f5fcff, #fff 55%, #effbfc); }
+.catalog-heading, .species-controls, .catalog-student-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.catalog-heading h2 { margin: 4px 0 5px; font-size: 25px; font-family: Nunito, sans-serif; font-weight: 900; }
+.catalog-heading p { font-size: 11px; color: #718b9f; line-height: 1.6; }
+.catalog-species-count { display: flex; align-items: center; gap: 7px; font-size: 11px; color: #167faa; white-space: nowrap; background: #e2f6fa; padding: 9px 13px; border-radius: 30px; }
+.catalog-student-row { margin: 20px 0; padding: 13px 16px; border: 1px solid #dcecf4; border-radius: 13px; background: #ffffffc4; }
+.catalog-student-row label { display: flex; align-items: center; gap: 13px; font-size: 10px; color: #6b8699; }
+.catalog-student-row select { max-width: 220px; padding: 9px 30px 9px 11px; border: 1px solid #cde4f0; background: #f6fcff; border-radius: 8px; color: #173e5d; font: inherit; font-size: 12px; font-weight: 600; }
+.catalog-pupil-xp { display: flex; gap: 12px; align-items: center; color: #7b91a2; font-size: 10px; }
+.catalog-pupil-xp strong { color: #17959b; font-size: 12px; white-space: nowrap; }
+.species-controls { margin: 13px 0 16px; }
+.species-filters { display: flex; gap: 5px; padding: 4px; background: #eaf4f9; border-radius: 11px; }
+.species-filters button { padding: 8px 15px; font-size: 10px; font-weight: 600; color: #69869b; white-space: nowrap; border-radius: 8px; }
+.species-filters button.active { color: white; background: linear-gradient(140deg, #0da9eb, #086ced); box-shadow: 0 3px 8px #097ce522; }
+.species-search { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border: 1px solid #dcebf3; border-radius: 10px; color: #8ba5b7; background: #fff; margin: 0; }
+.species-search input { width: 160px; min-width: 0; border: 0; outline: none; font: inherit; font-size: 11px; color: #194965; background: transparent; }
+.species-search:focus-within { border-color: #239fe1; box-shadow: 0 0 0 2px #0c9bea1c; }
+.species-grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 9px; }
+.species-card { position: relative; min-width: 0; padding: 5px 4px 10px; border: 1px solid #e0edf5; border-radius: 12px; background: linear-gradient(165deg, #b8eaf6 0%, #eafaff 55%, #fff 88%); transition: transform .18s, box-shadow .18s, border-color .18s; overflow: hidden; }
+.species-card:not(:disabled):hover { transform: translateY(-3px); border-color: #72c5ee; box-shadow: 0 7px 18px #0b79a419; }
+.species-card.selected { border-color: #119de1; box-shadow: 0 0 0 1px #119de1; background: linear-gradient(165deg, #a6e8f7, #e9faff 65%, #fff); }
+.species-portrait { display: flex; width: 100%; aspect-ratio: 1.04; align-items: center; justify-content: center; }
+.species-portrait > .fish-sprite { width: 100%; height: 100%; max-width: none; filter: drop-shadow(0 5px 4px #126f9220); }
+.species-card strong { display: block; min-height: 29px; color: #20445d; font-size: 9px; line-height: 1.45; font-weight: 700; text-align: center; }
+.species-card small { display: block; color: #6e95a8; font-size: 8px; line-height: 1.6; }
+.species-status, .species-lock { position: absolute; right: 5px; top: 5px; display: flex; padding: 4px; border-radius: 50%; background: #11a1c9; color: #fff; }
+.species-lock { top: auto; bottom: 56px; background: #244b68; border: 2px solid #e5f9ff; border-radius: 8px; }
+.species-card.locked { cursor: not-allowed; opacity: 1; }
+.species-card.unavailable { cursor: not-allowed; background: linear-gradient(155deg, #e5f2f7, #f9fdff); }
+.species-art-pending { color: #83a0b3; font-size: 10px; line-height: 1.7; letter-spacing: .15px; font-weight: 400; }
+.species-card.locked .species-portrait { filter: saturate(.85); }
+.species-card:focus-visible, .species-filters button:focus-visible { outline: 3px solid #f6b637; outline-offset: 3px; }
+.species-footnote { display: flex; align-items: center; gap: 6px; color: #849aaa; font-size: 9px; line-height: 1.6; margin: 15px 0 0; }
+.species-footnote > span { margin-left: auto; white-space: nowrap; }
+.species-empty { padding: 35px 15px; text-align: center; color: #829dad; font-size: 12px; }
+.species-picker-compact .species-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.species-picker-compact .species-controls { flex-wrap: wrap; gap: 10px; }
+.modal .species-search { display: flex; margin: 0; }
+.modal .species-search input { width: 155px; padding: 0; margin: 0; border: 0; background: transparent; border-radius: 0; }
+.species-picker-compact .species-footnote { flex-wrap: wrap; }
+@media (max-width: 1400px) { .species-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } .catalog-pupil-xp { max-width: 250px; line-height: 1.6; } }
+@media (max-width: 1000px) { .catalog-student-row { align-items: flex-start; flex-direction: column; gap: 10px; } .catalog-pupil-xp { max-width: none; } .species-controls { flex-wrap: wrap; } }
+@media (max-width: 720px) {
+  .fish-catalog { padding: 16px; margin-top: 18px; }
+  .catalog-heading { align-items: flex-start; gap: 8px; }
+  .catalog-heading h2 { font-size: 21px; }
+  .catalog-heading p { font-size: 10px; }
+  .catalog-species-count { font-size: 8px; padding: 6px 8px; gap: 4px; }
+  .catalog-species-count svg { width: 13px; }
+  .catalog-student-row { padding: 12px; margin: 14px 0; }
+  .catalog-student-row label { width: 100%; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .catalog-student-row select { width: 100%; max-width: none; }
+  .catalog-pupil-xp { font-size: 9px; gap: 10px; }
+  .species-filters { width: 100%; gap: 2px; }
+  .species-filters button { flex: 1; padding: 8px 4px; font-size: 8px; }
+  .species-search { width: 100%; }
+  .species-search input { width: 100%; }
+  .species-grid, .species-picker-compact .species-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .species-card strong { font-size: 9px; min-height: 26px; }
+  .species-footnote { flex-wrap: wrap; font-size: 8px; }
+  .species-footnote > span { width: 100%; margin-left: 0; }
+  .modal .species-search input { width: 100%; }
+}

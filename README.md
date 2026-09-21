@@ -35,6 +35,10 @@ npm start
 
 ## Açık sınırlar
 
+Canlı deniz güncellemesi: yüzey ışığı, hareketli su yansımaları, mercan/yosun salınımı, küçük balık sürüleri ve türe göre yüzme davranışları eklendi. Duraklatma ve azaltılmış hareket tercihi tüm hareket katmanlarını birlikte durdurur.
+
+Balık kataloğu 30 türü listeler; şu an 12 türün çizimi hazır ve seçilebilir. Kalan 18 türün kartları “Görsel hazırlanıyor” olarak gösterilir ve seçilemez. Eksik türlerin yerine başka balık çizimi kullanılmaz. Yeni, özgün karakter tasarımları ayrı bir sonraki aşamadır.
+
 Bu bir **çalışan görsel ürün demosudur**, üretim sistemi değildir. Örnek veriler tarayıcıdaki `sinifdenizi-v2` kaydında saklanır. Gerçek kimlik doğrulama, Supabase bağlantısı, sunucuda öğretmen/veli yetkilendirmesi ve özel fotoğraf depolama henüz bağlı değildir. Rol geçişi yalnızca demo gezintisidir; güvenlik sınırı değildir. Gerçek öğrenci verileri kullanmayın. Eski prototipin kayıtları sessizce taşınmaz veya silinmez; `legacy/index.html` içinde eski prototip korunmuştur.
 
 Balıklar yüksek kaliteli 2D sprite çizimleridir; ayrı yüzgeç/kuyruk iskelet animasyonları henüz yoktur. Kaçınma yumuşak bir hareket kuralıdır; yoğun gruplarda görsel örtüşmeler olabilir. Küçük ekranda tam ekran seçeneği kullanılabilir.

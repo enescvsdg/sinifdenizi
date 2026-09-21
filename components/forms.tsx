@@ -1,8 +1,9 @@
 "use client";
 import { useState } from "react";
 import Modal from "./modal";
-import { Fish } from "./sprites";
-import { species, type Student, type Task } from "@/lib/model";
+import { FishPicker } from "./fish-catalog";
+import { canChooseSpecies } from "@/lib/species";
+import { type Student, type Task } from "@/lib/model";
 export function StudentForm({
   onClose,
   onSave,
@@ -28,6 +29,10 @@ export function StudentForm({
                 ? "Sınıfta en fazla 40 öğrenci olabilir."
                 : "Öğrenci adını yazın.",
             );
+            return;
+          }
+          if (!canChooseSpecies(fish, 0)) {
+            setError("Başlangıç için hazır ve kilidi açık bir deniz arkadaşı seçin.");
             return;
           }
           onSave({
@@ -86,20 +91,7 @@ export function StudentForm({
           </label>
         </div>
         <h3>Deniz arkadaşını seç</h3>
-        <div className="fish-picker">
-          {species.map((name, i) => (
-            <button
-              type="button"
-              key={name}
-              aria-label={name}
-              onClick={() => setFish(i)}
-              className={fish === i ? "selected" : ""}
-            >
-              <Fish type={i} />
-              <small>{name}</small>
-            </button>
-          ))}
-        </div>
+        <FishPicker selected={fish} xp={0} onSelect={setFish} compact />
         {error && (
           <p role="alert" className="form-error">
             {error}
