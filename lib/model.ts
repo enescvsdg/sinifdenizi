@@ -84,10 +84,11 @@ const names = [
   "Kaan Demir",
 ];
 export function initialState(): SchoolState {
+  const starterSpecies = speciesDefinitions.filter((fish) => canChooseSpecies(fish.id, 0));
   const students = names.map((name, i) => ({
     id: `student-${i}`,
     name,
-    fish: i % 12,
+    fish: starterSpecies[i % starterSpecies.length].id,
     xp: 120 + ((i * 31) % 260),
     feed: 20 + ((i * 7) % 65),
     completed: 2 + (i % 8),

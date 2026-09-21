@@ -1,22 +1,7 @@
 import { useId, type CSSProperties } from "react";
+import { getCreatureArt } from "@/lib/creature-art";
 export const asset = (name: string) =>
   `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/assets/${name}`;
-// Each creature has an individual atlas viewport: generated silhouettes are not
-// confined to uniform cells. Tight viewports prevent neighbouring fin fragments.
-const fishBounds = [
-  [0, 58, 360, 248],
-  [365, 50, 365, 263],
-  [755, 0, 334, 327],
-  [1116, 55, 332, 269],
-  [0, 304, 384, 385],
-  [391, 392, 345, 250],
-  [797, 330, 252, 357],
-  [1013, 365, 435, 279],
-  [0, 695, 390, 331],
-  [385, 694, 400, 284],
-  [785, 688, 366, 350],
-  [1168, 655, 280, 417],
-];
 export function Fish({
   type = 0,
   className = "",
@@ -26,15 +11,10 @@ export function Fish({
   className?: string;
   style?: CSSProperties;
 }) {
-  const bounds = fishBounds[type];
+  const art = getCreatureArt(type);
   const clip = useId();
-  if (!bounds) return null;
-  const shape =
-    type === 6
-      ? "797,330 1049,330 1049,480 1000,500 1000,687 797,687"
-      : type === 7
-        ? "1060,365 1448,365 1448,644 1013,644 1013,575 1080,520"
-        : null;
+  if (!art) return null;
+  const bounds = art.viewBox;
   return (
     <svg
       aria-hidden="true"
@@ -44,8 +24,10 @@ export function Fish({
     >
       <defs>
         <clipPath id={clip}>
-          {shape ? (
-            <polygon points={shape} />
+          {art.clip?.kind === "polygon" ? (
+            <polygon points={art.clip.points} />
+          ) : art.clip?.kind === "path" ? (
+            <path d={art.clip.d} />
           ) : (
             <rect
               x={bounds[0]}
@@ -57,9 +39,9 @@ export function Fish({
         </clipPath>
       </defs>
       <image
-        href={asset("creatures.png")}
-        width="1448"
-        height="1086"
+        href={asset(art.image.file)}
+        width={art.image.width}
+        height={art.image.height}
         clipPath={`url(#${clip})`}
       />
     </svg>

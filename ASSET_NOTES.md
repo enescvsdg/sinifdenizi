@@ -2,6 +2,12 @@
 
 2026-09-21: Yerleşik imagegen aracı kullanıldı; CLI veya API anahtarı kullanılmadı. PNG dosyaları proje içine kopyalandı; kaynak referanslar değiştirilmedi. Uygulama dış görsel servislerine bağlanmaz.
 
+## Yeni özgün karakter seti
+
+`public/assets/creatures-original-01.png`–`creatures-original-05.png`, 30 türün yeni çizimlerini içerir. Her atlas 1536 × 1024 piksel ve gerçek alfa kanallı PNG'dir. İlk atlas sıfırdan üretildi; sonraki atlaslarda yalnız bu yeni çizimlerin malzeme ve ışık dili referans alındı. Kaynak kullanıcı referansları ve eski atlas dosyaları korunmuştur.
+
+Sayısal tür kimlikleri değişmeden, gerçek çizim sınırları ve gerekli kırpma maskeleri `lib/creature-art.ts` içinde eşlenir. Üretimde kullanılan son promptların tamamı [docs/ASSET_GENERATION_PROMPTS.md](docs/ASSET_GENERATION_PROMPTS.md) dosyasındadır. Tasarım hedefleri [docs/ORIGINAL_CREATURE_BRIEF.md](docs/ORIGINAL_CREATURE_BRIEF.md) içindedir. Aşağıdaki `creatures.png` eski setin üretim kaydıdır.
+
 ## `public/assets/aquarium.png`
 
 Prompt: Create a production game background asset, landscape 16:9, for SınıfDenizi classroom aquarium. Rich high-end stylized 3D underwater illustration, luminous turquoise water, layered blue distant rock formations, shafts of sunlight and underwater caustics, fine sandy seabed. Colorful rounded pink violet orange corals frame lower corners, subtle seaweed left and right. Wide open central 70% swimming area and deep blue gradient, distant small ancient stone arch at far right, subtle old shipwreck silhouette far left. Friendly premium children's educational game, beautiful dimensional materials, cinematic light. NO fish, NO animals, NO text, NO UI, NO labels, NO logos. This will be a moving aquarium background with separate animated creature sprites on top; reserve spacious clean water for them. Original scenery.
@@ -26,3 +32,5 @@ Prompt: Create one production game decoration sprite atlas, genuine TRANSPARENT 
 06: güçlü akvaryum vitrini, öğretmen/veli ayrımı, mobil uyum.
 
 Eski `brand-guide.jpg` ve `reference-board.jpg` dosyaları görüntüleyicide açılamadı; dosyalar değiştirilmeden korundu. Kullanıcının sonradan sağladığı altı JPEG ana görsel kaynak olarak incelendi.
+
+Çekiçbaş köpekbalığı (ID 13), baş biçimini belirginleştirmek için ayrıca üretilen `public/assets/creature-hammerhead-original.png` dosyasını kullanır (1536 × 1024, RGBA). Üçüncü atlasın ilk çizimi dosyada korunur ancak bu türün görünümünde kullanılmaz.

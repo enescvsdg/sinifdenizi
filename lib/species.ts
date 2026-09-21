@@ -1,3 +1,5 @@
+import { hasCreatureArt } from "./creature-art.ts";
+
 export type SpeciesCategory = "small" | "large" | "special";
 export type SpeciesDefinition = {
   id: number;
@@ -44,7 +46,7 @@ const speciesRows: readonly Omit<SpeciesDefinition, "available">[] = [
 // A species becomes selectable only when its own finished artwork is available.
 // Do not substitute an unrelated creature for a missing species asset.
 export const speciesDefinitions: readonly SpeciesDefinition[] = speciesRows.map(
-  (fish) => ({ ...fish, available: fish.id < 12 }),
+  (fish) => ({ ...fish, available: hasCreatureArt(fish.id) }),
 );
 
 export const species = speciesDefinitions.map((fish) => fish.name);
