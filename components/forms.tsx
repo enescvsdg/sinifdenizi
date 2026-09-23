@@ -1,34 +1,74 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Modal from "./modal";
 import { FishPicker } from "./fish-catalog";
 import { canChooseSpecies } from "@/lib/species";
+import { createId } from "@/lib/ids";
+import { maxPhotoBytes, photoTypes, shrinkPhoto } from "@/lib/photo";
 import { type Student, type Task } from "@/lib/model";
 export function StudentForm({
   onClose,
   onSave,
   count,
+  student,
 }: {
   onClose: () => void;
   onSave: (s: Student) => void;
   count: number;
+  /** Edit this student's name and photo instead of adding a new student. */
+  student?: Student;
 }) {
   const [fish, setFish] = useState(0),
-    [photo, setPhoto] = useState<string>(),
+    [photo, setPhoto] = useState(student?.photo),
     [error, setError] = useState(""),
     [loading, setLoading] = useState(false);
+  const fileInput = useRef<HTMLInputElement>(null),
+    photoJob = useRef(0);
+  const full = !student && count >= 40;
+  async function choosePhoto(input: HTMLInputElement) {
+    const f = input.files?.[0];
+    if (!f) return;
+    // A slower earlier choice must not replace a newer one.
+    const job = ++photoJob.current;
+    if (f.size > maxPhotoBytes || !photoTypes.includes(f.type)) {
+      input.value = "";
+      setError("En fazla 10 MB boyutunda JPG, PNG veya WebP seçin.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const small = await shrinkPhoto(f);
+      if (job !== photoJob.current) return;
+      setPhoto(small);
+      setError("");
+    } catch {
+      if (job !== photoJob.current) return;
+      input.value = "";
+      setError("Fotoğraf okunamadı.");
+    } finally {
+      if (job === photoJob.current) setLoading(false);
+    }
+  }
   return (
-    <Modal title="Yeni bir deniz arkadaşı" onClose={onClose} wide>
+    <Modal
+      title={student ? "Öğrenci bilgilerini düzenle" : "Yeni bir deniz arkadaşı"}
+      onClose={onClose}
+      wide
+    >
       <form
         onSubmit={(e) => {
           e.preventDefault();
           const name = String(new FormData(e.currentTarget).get("name")).trim();
-          if (!name || count >= 40) {
+          if (!name || full) {
             setError(
-              count >= 40
+              full
                 ? "Sınıfta en fazla 40 öğrenci olabilir."
                 : "Öğrenci adını yazın.",
             );
+            return;
+          }
+          if (student) {
+            onSave({ ...student, name, photo });
             return;
           }
           if (!canChooseSpecies(fish, 0)) {
@@ -36,12 +76,11 @@ export function StudentForm({
             return;
           }
           onSave({
-            id: crypto.randomUUID(),
+            id: createId(),
             name,
             fish,
             xp: 0,
             feed: 5,
-            completed: 0,
             photo,
           });
         }}
@@ -52,46 +91,47 @@ export function StudentForm({
             <input
               name="name"
               placeholder="Örn. Deniz Yılmaz"
+              defaultValue={student?.name}
               maxLength={70}
               required
               autoFocus
             />
           </label>
-          <label>
-            Profil fotoğrafı (isteğe bağlı)
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (!f) return;
-                if (
-                  f.size > 800000 ||
-                  !["image/jpeg", "image/png", "image/webp"].includes(f.type)
-                ) {
-                  setError(
-                    "En fazla 800 KB boyutunda JPG, PNG veya WebP seçin.",
-                  );
-                  return;
-                }
-                setLoading(true);
-                const reader = new FileReader();
-                reader.onload = () => {
-                  setPhoto(String(reader.result));
-                  setError("");
-                  setLoading(false);
-                };
-                reader.onerror = () => {
-                  setError("Fotoğraf okunamadı.");
-                  setLoading(false);
-                };
-                reader.readAsDataURL(f);
-              }}
-            />
-          </label>
+          <div>
+            <label>
+              Profil fotoğrafı (isteğe bağlı)
+              <input
+                ref={fileInput}
+                type="file"
+                accept={photoTypes.join(",")}
+                onChange={(e) => choosePhoto(e.currentTarget)}
+              />
+            </label>
+            {photo && (
+              <div className="photo-preview">
+                <img src={photo} alt="Seçilen profil fotoğrafı" />
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={() => {
+                    photoJob.current++;
+                    setPhoto(undefined);
+                    setLoading(false);
+                    if (fileInput.current) fileInput.current.value = "";
+                  }}
+                >
+                  Fotoğrafı kaldır
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-        <h3>Deniz arkadaşını seç</h3>
-        <FishPicker selected={fish} xp={0} onSelect={setFish} compact />
+        {!student && (
+          <>
+            <h3>Deniz arkadaşını seç</h3>
+            <FishPicker selected={fish} xp={0} onSelect={setFish} compact />
+          </>
+        )}
         {error && (
           <p role="alert" className="form-error">
             {error}
@@ -101,8 +141,8 @@ export function StudentForm({
           <button type="button" className="secondary" onClick={onClose}>
             Vazgeç
           </button>
-          <button className="primary" disabled={loading || count >= 40}>
-            Öğrenciyi ekle
+          <button className="primary" disabled={loading || full}>
+            {student ? "Değişiklikleri kaydet" : "Öğrenciyi ekle"}
           </button>
         </div>
       </form>
@@ -134,7 +174,7 @@ export function TaskForm({
             return;
           }
           onSave({
-            id: crypto.randomUUID(),
+            id: createId(),
             title,
             description: String(data.get("description")).trim(),
             type: String(data.get("type")),

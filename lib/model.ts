@@ -12,13 +12,21 @@ export const decorNames = [
   "Sualtı kalesi",
 ];
 export const decorThresholds = [0, 0, 500, 1200, 2000, 3000, 4200, 5600, 7200];
+export const badges = [
+  { name: "İlk adım", tasks: 1 },
+  { name: "Deniz kaşifi", tasks: 5 },
+  { name: "Görev ustası", tasks: 10 },
+  { name: "Derin deniz uzmanı", tasks: 20 },
+  { name: "Sınıf yıldızı", tasks: 35 },
+  { name: "Okyanus efsanesi", tasks: 50 },
+] as const;
 export type Student = {
   id: string;
   name: string;
   fish: number;
   xp: number;
   feed: number;
-  completed: number;
+  /** A small data URL (see lib/photo.ts); never a remote address. */
   photo?: string;
 };
 export type Task = {
@@ -37,6 +45,8 @@ export type Activity = {
   text: string;
   kind: "task" | "student" | "feed";
   time: string;
+  /** The student the text names, so it goes when the student is removed. */
+  studentId?: string;
 };
 export type SchoolState = {
   version: 2;
@@ -57,6 +67,15 @@ export function participation(s: SchoolState) {
       )
     : 0;
 }
+/** Completed tasks per student, counted from the task records themselves. */
+export function completedCounts(s: SchoolState) {
+  const counts = new Map<string, number>();
+  for (const task of s.tasks)
+    for (const id of task.done) counts.set(id, (counts.get(id) ?? 0) + 1);
+  return counts;
+}
+export const earnedBadges = (completed: number) =>
+  badges.filter((badge) => completed >= badge.tasks);
 const names = [
   "Ali Demir",
   "Zeynep Yılmaz",
@@ -85,61 +104,125 @@ const names = [
 ];
 export function initialState(): SchoolState {
   const starterSpecies = speciesDefinitions.filter((fish) => canChooseSpecies(fish.id, 0));
+  const ids = names.map((_, i) => `student-${i}`);
+  const group = (member: (i: number) => boolean) =>
+    ids.filter((_, i) => member(i));
+  const everyone = () => group(() => true);
+  const tasks: Task[] = [
+    {
+      id: "task-1",
+      title: "Her gün 15 dakika kitap okuyorum",
+      description:
+        "Sevdiğin bir kitabı seç. Okuduklarını sınıfta arkadaşlarınla paylaş.",
+      type: "Okuma",
+      due: "2026-09-25",
+      xp: 50,
+      feed: 10,
+      assigned: everyone(),
+      done: ids.slice(0, 18),
+    },
+    {
+      id: "task-2",
+      title: "Matematik keşif defteri",
+      description: "Çalışma kitabındaki 12–14. sayfaları tamamla.",
+      type: "Ödev",
+      due: "2026-09-26",
+      xp: 75,
+      feed: 15,
+      assigned: everyone(),
+      done: ids.slice(0, 13),
+    },
+    {
+      id: "task-3",
+      title: "Bir arkadaşına yardım et",
+      description: "Birlikte öğrenmenin güzelliğini keşfet.",
+      type: "Davranış",
+      due: "2026-09-27",
+      xp: 30,
+      feed: 5,
+      assigned: everyone(),
+      done: ids.slice(0, 21),
+    },
+    // Earlier tasks, finished by everyone they were given to.
+    {
+      id: "task-4",
+      title: "Deniz canlıları poster sunumu",
+      description: "Grubunla seçtiğin bir deniz canlısını posterle tanıt.",
+      type: "Proje",
+      due: "2026-09-19",
+      xp: 80,
+      feed: 15,
+      assigned: group((i) => i % 2 === 0),
+      done: group((i) => i % 2 === 0),
+    },
+    {
+      id: "task-5",
+      title: "Kütüphane köşesine yardım",
+      description: "Sınıf kitaplığındaki kitapları türlerine göre düzenle.",
+      type: "Davranış",
+      due: "2026-09-17",
+      xp: 30,
+      feed: 5,
+      assigned: group((i) => i % 3 === 0),
+      done: group((i) => i % 3 === 0),
+    },
+    {
+      id: "task-6",
+      title: "İlk hikâye kitabım",
+      description: "Okuduğun hikâyenin en sevdiğin bölümünü anlat.",
+      type: "Okuma",
+      due: "2026-09-16",
+      xp: 50,
+      feed: 10,
+      assigned: group((i) => i % 4 !== 0),
+      done: group((i) => i % 4 !== 0),
+    },
+    {
+      id: "task-7",
+      title: "Toplama ve çıkarma alıştırmaları",
+      description: "Çalışma kitabındaki 8–10. sayfaları tamamla.",
+      type: "Ödev",
+      due: "2026-09-15",
+      xp: 60,
+      feed: 12,
+      assigned: everyone(),
+      done: everyone(),
+    },
+    {
+      id: "task-8",
+      title: "Sınıf kurallarımızı birlikte yazalım",
+      description: "Sınıfımız için bir kural öner ve panoya ekle.",
+      type: "Katılım",
+      due: "2026-09-11",
+      xp: 40,
+      feed: 8,
+      assigned: everyone(),
+      done: everyone(),
+    },
+  ];
   const students = names.map((name, i) => ({
-    id: `student-${i}`,
+    id: ids[i],
     name,
     fish: starterSpecies[i % starterSpecies.length].id,
-    xp: 120 + ((i * 31) % 260),
+    // Sample XP is exactly what each student's completed tasks paid out.
+    xp: tasks
+      .filter((task) => task.done.includes(ids[i]))
+      .reduce((sum, task) => sum + task.xp, 0),
     feed: 20 + ((i * 7) % 65),
-    completed: 2 + (i % 8),
   }));
   return {
     version: 2,
     students,
     decorations: [0, 1, 2, 3, 4],
     note: "Bu hafta düzenli okuma alışkanlığını destekliyoruz. Her gün birlikte 15 dakika okumak, küçük ama çok değerli bir adım.",
-    tasks: [
-      {
-        id: "task-1",
-        title: "Her gün 15 dakika kitap okuyorum",
-        description:
-          "Sevdiğin bir kitabı seç. Okuduklarını sınıfta arkadaşlarınla paylaş.",
-        type: "Okuma",
-        due: "2026-09-25",
-        xp: 50,
-        feed: 10,
-        assigned: students.map((x) => x.id),
-        done: students.slice(0, 18).map((x) => x.id),
-      },
-      {
-        id: "task-2",
-        title: "Matematik keşif defteri",
-        description: "Çalışma kitabındaki 12–14. sayfaları tamamla.",
-        type: "Ödev",
-        due: "2026-09-26",
-        xp: 75,
-        feed: 15,
-        assigned: students.map((x) => x.id),
-        done: students.slice(0, 13).map((x) => x.id),
-      },
-      {
-        id: "task-3",
-        title: "Bir arkadaşına yardım et",
-        description: "Birlikte öğrenmenin güzelliğini keşfet.",
-        type: "Davranış",
-        due: "2026-09-27",
-        xp: 30,
-        feed: 5,
-        assigned: students.map((x) => x.id),
-        done: students.slice(0, 21).map((x) => x.id),
-      },
-    ],
+    tasks,
     activities: [
       {
         id: "a1",
         text: "Zeynep okuma görevini tamamladı.",
         kind: "task" as const,
         time: "Az önce",
+        studentId: "student-1",
       },
       {
         id: "a2",
@@ -152,6 +235,7 @@ export function initialState(): SchoolState {
         text: "Ali balığını besledi.",
         kind: "feed" as const,
         time: "Bugün",
+        studentId: "student-0",
       },
     ],
   };
@@ -178,7 +262,6 @@ export function approveTask(
             ...x,
             xp: x.xp + t.xp,
             feed: x.feed + t.feed,
-            completed: x.completed + 1,
           }
         : x,
     ),
@@ -191,6 +274,7 @@ export function approveTask(
         text: `${st.name.split(" ")[0]}, “${t.title}” görevini tamamladı.`,
         kind: "task" as const,
         time: "Az önce",
+        studentId,
       },
       ...s.activities,
     ].slice(0, 20),
@@ -230,7 +314,8 @@ export function validState(value: unknown): value is SchoolState {
         x.xp >= 0 &&
         Number.isFinite(x.feed) &&
         x.feed >= 0 &&
-        Number.isFinite(x.completed),
+        (x.photo === undefined ||
+          (typeof x.photo === "string" && x.photo.startsWith("data:image/"))),
     ) &&
     Array.isArray(s.tasks) &&
     s.tasks.every(
@@ -257,5 +342,44 @@ export function assignStudentFish(s: SchoolState, studentId: string, fish: numbe
   return {
     ...s,
     students: s.students.map((entry) => entry.id === studentId ? { ...entry, fish } : entry),
+  };
+}
+
+/** Renames a student and replaces or removes the photo; a blank name is ignored. */
+export function updateStudent(
+  s: SchoolState,
+  studentId: string,
+  changes: { name: string; photo?: string },
+): SchoolState {
+  const name = changes.name.trim();
+  if (!name || !s.students.some((entry) => entry.id === studentId)) return s;
+  return {
+    ...s,
+    students: s.students.map((entry) => {
+      if (entry.id !== studentId) return entry;
+      const { photo: _previous, ...rest } = entry;
+      return changes.photo ? { ...rest, name, photo: changes.photo } : { ...rest, name };
+    }),
+  };
+}
+
+/**
+ * Removes a student with their task records and the activities that name
+ * them; a task given only to them goes too.
+ */
+export function removeStudent(s: SchoolState, studentId: string): SchoolState {
+  if (!s.students.some((entry) => entry.id === studentId)) return s;
+  const keep = (id: string) => id !== studentId;
+  return {
+    ...s,
+    students: s.students.filter((entry) => keep(entry.id)),
+    tasks: s.tasks
+      .filter((task) => !task.assigned.length || task.assigned.some(keep))
+      .map((task) => ({
+        ...task,
+        assigned: task.assigned.filter(keep),
+        done: task.done.filter(keep),
+      })),
+    activities: s.activities.filter((entry) => entry.studentId !== studentId),
   };
 }

@@ -30,7 +30,7 @@ npm start
 - Yeni örnek sınıfta 24 farklı temel tür; mevcut `sinifdenizi-v2` kayıtlarında öğrenci seçimi ve tür ID'leri korunur.
 - Yüzey ışığı, hareketli su yansımaları, mercan/yosun salınımı, küçük ortam sürüleri ve türe göre yüzme rotaları.
 - Duraklatma, azaltılmış hareket tercihi, tam ekran ve klavye ile öğrenci seçimi.
-- Öğrenci ekleme, yerel fotoğraf, arama, profil ve balık değiştirme; 40 öğrenci sınırı.
+- Öğrenci ekleme, düzenleme ve sınıftan çıkarma; arama, profil ve balık değiştirme; 40 öğrenci sınırı. Yerel fotoğraflar (en fazla 10 MB) tarayıcıda 256 × 256 piksellik küçük bir kareye dönüştürülerek saklanır.
 - Tüm sınıfa veya seçilen öğrencilere görev atama, öğrenci bazında tek seferlik onay, XP ve yem ödülleri.
 - Yem harcayarak besleme; sınıf XP'sine göre dokuz dekorun açılması ve akvaryuma eklenmesi/kaldırılması.
 - Görevlerden türetilen katılım raporları, rozetler ve etkinlik akışı.
@@ -40,7 +40,7 @@ npm start
 
 30 türün tamamının çizimi hazırdır. Görseller `public/assets/creatures-original-01.png` ile `creatures-original-05.png` arasındaki beş adet 1.536 × 1.024 piksel RGBA atlasında yer alır. Her atlas, 3 × 2 düzende altı tür içerir. Özel türlerin seçilememesi eksik görselden değil, öğrencinin XP koşulundan kaynaklanır. Yeni çizimler mevcut deniz hareketlerini, duraklatmayı ve azaltılmış hareket tercihini korur.
 
-Bu bir **çalışan görsel ürün demosudur**, üretim sistemi değildir. Örnek veriler tarayıcıdaki `sinifdenizi-v2` kaydında saklanır. Gerçek kimlik doğrulama, Supabase bağlantısı, sunucuda öğretmen/veli yetkilendirmesi ve özel fotoğraf depolama henüz bağlı değildir. Rol geçişi yalnızca demo gezintisidir; güvenlik sınırı değildir. Gerçek öğrenci verileri kullanmayın. Eski prototipin kayıtları sessizce taşınmaz veya silinmez; `legacy/index.html` içinde eski prototip korunmuştur.
+Bu bir **çalışan görsel ürün demosudur**, üretim sistemi değildir. Örnek veriler tarayıcıdaki `sinifdenizi-v2` kaydında saklanır. Depolama alanı dolduğu için kaydedilemeyen bir değişiklik ekranda da geri alınır. Bu sürümün okuyamadığı bir kayıt silinmez; `sinifdenizi-v2-yedek-<tarih>` anahtarına taşınır ve örnek sınıf açılır. Gerçek kimlik doğrulama, Supabase bağlantısı, sunucuda öğretmen/veli yetkilendirmesi ve özel fotoğraf depolama henüz bağlı değildir. Rol geçişi yalnızca demo gezintisidir; güvenlik sınırı değildir. Gerçek öğrenci verileri kullanmayın. Eski prototipin kayıtları sessizce taşınmaz veya silinmez; `legacy/index.html` içinde eski prototip korunmuştur.
 
 Balıklar tek pozlu 2D sprite çizimleridir. Mevcut hareket, bütün gövdenin türüne uygun rotada ilerlemesi ve CSS salınımlarıyla sağlanır; ayrı yüzgeç/kuyruk iskelet animasyonları veya kare kare uzuv döngüleri henüz yoktur. 26 numaralı Renkli sürüler tek bileşik çizimdir; bu çizimin içindeki balıklar bağımsız hareket etmez. Akvaryumdaki dekoratif ortam sürüleri ayrı bir hareket katmanıdır. Kaçınma yumuşak bir hareket kuralıdır; yoğun gruplarda görsel örtüşmeler olabilir. Küçük ekranda tam ekran seçeneği kullanılabilir.
 
@@ -52,10 +52,13 @@ Balıklar tek pozlu 2D sprite çizimleridir. Mevcut hareket, bütün gövdenin t
 - `lib/species.ts`: 30 sabit tür ID'si, katalog filtreleri ve öğrenci XP kilitleri.
 - `lib/creature-art.ts`: atlas dosyaları ve türlerin görsel alanları.
 - `lib/swimming.ts`: zamana dayalı hareket ve kaçınma motoru.
+- `lib/storage.ts`: tarayıcı kaydı, kaydedilemeyen değişikliklerin bildirimi ve okunamayan kayıtların yedeklenmesi.
+- `lib/photo.ts`: profil fotoğraflarını küçültme.
+- `lib/ids.ts`: HTTPS olmayan okul ağlarında da çalışan kimlik üretimi.
 - `public/assets/`: yeni, özgün PNG ortam ve sprite atlasları.
 - `design-reference/`: altı ana referans ve korunmuş eski iki dosya.
 - `docs/ORIGINAL_CREATURE_BRIEF.md`: özgün karakter tasarım hedefleri, atlas teslim durumu ve ileride hazırlanacak uzuv animasyonları.
-- `tests/`: ödül bütünlüğü, veri doğrulama, 40 balık testi ve tarayıcı akışları.
+- `tests/`: ödül bütünlüğü, veri doğrulama, kayıt ve yedekleme, 40 balık testi ve tarayıcı akışları.
 
 ## Tarayıcı kontrolü
 

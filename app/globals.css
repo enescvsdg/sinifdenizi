@@ -409,7 +409,8 @@ svg {
 .primary,
 .secondary,
 .feed-button,
-.selected-button {
+.selected-button,
+.danger-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -450,6 +451,27 @@ svg {
 .selected-button {
   background: #e7f7f0;
   color: #13a180;
+}
+.danger-button {
+  background: #c2412d;
+  color: white;
+}
+.danger-button:hover {
+  background: #a8351f;
+}
+.danger-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 37px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #b3361f;
+}
+.danger-link:hover {
+  background: #fff1ee;
 }
 .card {
   background: #fff;
@@ -1828,6 +1850,48 @@ svg {
   margin-top: 5px;
   color: #93a3b5;
 }
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+.remove-confirm {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid #f6d3c9;
+  border-radius: 12px;
+  background: #fff5f2;
+}
+.remove-confirm p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #7a2e21;
+}
+.remove-confirm > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+.photo-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: -6px;
+}
+.photo-preview img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.photo-preview .text-button {
+  font-size: 12px;
+  color: #1f6fb8;
+}
 .toast {
   position: fixed;
   bottom: 25px;
@@ -1853,6 +1917,16 @@ svg {
   color: #b8cedc;
   padding: 0;
   display: flex;
+}
+.toast-error {
+  background: #6b2a1f;
+  border-color: #8f4133;
+}
+.toast-error > svg {
+  color: #ffb4a3;
+}
+.toast-error > button {
+  color: #f3cfc6;
 }
 .muted {
   color: #91a4b5;

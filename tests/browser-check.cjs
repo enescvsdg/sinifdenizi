@@ -84,6 +84,70 @@ const path = require("node:path");
   await page.getByRole("textbox", { name: "Öğrenci ara" }).fill("Test Deniz");
   if ((await page.locator(".student-card").count()) !== 1)
     throw Error("Student not added");
+  // A 2.4 MB photo is stored as a small square, so storage does not fill up.
+  await page.getByRole("button", { name: "Öğrenci ekle", exact: true }).click();
+  await page.getByLabel("Ad soyad", { exact: true }).fill("Foto Deniz");
+  await page
+    .getByLabel("Profil fotoğrafı (isteğe bağlı)")
+    .setInputFiles(path.join(__dirname, "../public/assets/aquarium.png"));
+  await page.getByAltText("Seçilen profil fotoğrafı").waitFor();
+  await page
+    .getByRole("button", { name: "Öğrenciyi ekle", exact: true })
+    .click();
+  const photoLength = await page.evaluate(
+    () =>
+      JSON.parse(localStorage.getItem("sinifdenizi-v2")).students.find(
+        (s) => s.name === "Foto Deniz",
+      )?.photo?.length ?? 0,
+  );
+  if (!(photoLength > 0 && photoLength < 100000))
+    throw Error(`Photo not shrunk: ${photoLength} characters`);
+  await page.locator(".student-card").first().click();
+  await page.getByRole("button", { name: "Bilgileri düzenle" }).click();
+  await page.getByLabel("Ad soyad", { exact: true }).fill("Test Deniz Kaya");
+  await page
+    .getByRole("button", { name: "Değişiklikleri kaydet", exact: true })
+    .click();
+  await page.waitForFunction(() =>
+    localStorage.getItem("sinifdenizi-v2").includes("Test Deniz Kaya"),
+  );
+  await page.getByRole("button", { name: "Kapat", exact: true }).click();
+  await page.getByRole("textbox", { name: "Öğrenci ara" }).fill("Foto Deniz");
+  await page.locator(".student-card").first().click();
+  await page.getByRole("button", { name: "Sınıftan çıkar", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Evet, sınıftan çıkar", exact: true })
+    .click();
+  await page.waitForFunction(
+    () => !localStorage.getItem("sinifdenizi-v2").includes("Foto Deniz"),
+  );
+  if ((await page.locator(".student-card").count()) !== 0)
+    throw Error("Student not removed");
+  // A change that no longer fits in storage is undone on screen too.
+  await page.evaluate(() => {
+    let low = 0,
+      high = 12000000;
+    while (low < high) {
+      const mid = Math.ceil((low + high) / 2);
+      try {
+        localStorage.setItem("e2e-filler", "x".repeat(mid));
+        low = mid;
+      } catch {
+        high = mid - 1;
+      }
+    }
+    localStorage.setItem("e2e-filler", "x".repeat(low));
+  });
+  await page.getByRole("button", { name: "Öğrenci ekle", exact: true }).click();
+  await page.getByLabel("Ad soyad", { exact: true }).fill("Sığmayan Öğrenci");
+  await page
+    .getByRole("button", { name: "Öğrenciyi ekle", exact: true })
+    .click();
+  await page.getByText("Değişiklik kaydedilemedi ve geri alındı").waitFor();
+  await page.getByRole("textbox", { name: "Öğrenci ara" }).fill("Sığmayan");
+  if ((await page.locator(".student-card").count()) !== 0)
+    throw Error("Unsaved student kept on screen");
+  await page.evaluate(() => localStorage.removeItem("e2e-filler"));
   await page.getByRole("button", { name: "Veli görünümü" }).click();
   await page.getByLabel("Çocuk seç").selectOption("student-1");
   if ((await page.getByLabel("Çocuk seç").inputValue()) !== "student-1")
@@ -124,6 +188,12 @@ const path = require("node:path");
   await page.reload({ waitUntil: "networkidle" });
   if ((await page.locator(".swimmer").count()) !== 25)
     throw Error("Student not persisted");
+  if (
+    !(await page.evaluate(() =>
+      localStorage.getItem("sinifdenizi-v2").includes("Test Deniz Kaya"),
+    ))
+  )
+    throw Error("Edit not persisted");
   await page.evaluate(() => localStorage.clear());
   await page.reload({ waitUntil: "networkidle" });
   await page.setViewportSize({ width: 390, height: 844 });
@@ -143,7 +213,10 @@ const path = require("node:path");
     .getByRole("button", { name: "Görevler", exact: false })
     .first()
     .click();
-  if ((await page.locator(".task-card").count()) !== 3)
+  const sampleTasks = await page.evaluate(
+    () => JSON.parse(localStorage.getItem("sinifdenizi-v2")).tasks.length,
+  );
+  if ((await page.locator(".task-card").count()) !== sampleTasks)
     throw Error("Mobile navigation failed");
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page
@@ -186,7 +259,7 @@ const path = require("node:path");
     throw Error("Reduced motion ignored");
   if (errors.length) throw Error(errors.join("\n"));
   console.log(
-    "PASS: aquarium selection, task creation/approval, student creation/search, parent read-only, persistence, mobile navigation, no page errors",
+    "PASS: aquarium selection, task creation/approval, student creation/search, photo shrinking, student edit/removal, save rollback, parent read-only, persistence, mobile navigation, no page errors",
   );
   await browser.close();
 })().catch((e) => {

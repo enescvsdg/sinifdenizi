@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Waves,
   House,
@@ -30,6 +30,9 @@ import {
   Sparkles,
   CalendarDays,
   ShieldCheck,
+  CircleAlert,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import Aquarium from "./aquarium";
 import FishCatalog, { FishPicker } from "./fish-catalog";
@@ -39,11 +42,15 @@ import { Fish, Decor, asset } from "./sprites";
 import {
   initialState,
   assignStudentFish,
-  validState,
   approveTask,
   feedStudents,
   classXp,
   participation,
+  completedCounts,
+  badges,
+  earnedBadges,
+  updateStudent,
+  removeStudent,
   level,
   species,
   decorNames,
@@ -51,6 +58,7 @@ import {
   type SchoolState,
   type Student,
 } from "@/lib/model";
+import { browserStorage, loadState, saveState } from "@/lib/storage";
 type Page =
   | "aquarium"
   | "dashboard"
@@ -69,7 +77,7 @@ const navigation: [Page, string, typeof Waves][] = [
   ["badges", "Rozetler", Award],
   ["reports", "Raporlar", ChartNoAxesCombined],
 ];
-const storageKey = "sinifdenizi-v2";
+type Toast = { text: string; tone: "success" | "error" };
 function initials(name: string) {
   return name
     .split(" ")
@@ -128,39 +136,76 @@ export default function SchoolApp() {
     [page, setPage] = useState<Page>("aquarium"),
     [role, setRole] = useState<"teacher" | "parent" | "welcome">("teacher"),
     [mobile, setMobile] = useState(false),
-    [modal, setModal] = useState<"student" | "task" | "notice" | null>(null),
+    [modal, setModal] = useState<
+      "student" | "edit-student" | "task" | "notice" | null
+    >(null),
     [selected, setSelected] = useState<string | null>(null),
-    [toast, setToast] = useState(""),
+    [removing, setRemoving] = useState<string | null>(null),
+    [toast, setToast] = useState<Toast | null>(null),
     [query, setQuery] = useState(""),
     [feeding, setFeeding] = useState(0),
     [child, setChild] = useState("student-0"),
     [taskFilter, setTaskFilter] = useState("Tümü");
+  // `saved` mirrors what is in storage; `persist` is off when saving would
+  // be impossible or would destroy a record this version cannot read.
+  const saved = useRef<SchoolState | null>(null),
+    persist = useRef(true);
+  function notify(text: string, tone: Toast["tone"] = "success") {
+    setToast({ text, tone });
+  }
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (validState(parsed)) setState(parsed);
-        else setToast("Eski demo kaydı okunamadı. Örnek sınıf açıldı.");
-      }
-    } catch {
-      setToast("Bu tarayıcıda kayıt alanına erişilemiyor.");
+    const result = loadState(browserStorage());
+    if (result.status === "loaded") {
+      saved.current = result.state;
+      setState(result.state);
+    } else if (result.status === "backedUp") {
+      notify(
+        `Kayıtlı sınıf bu sürümde açılamadı. Eski kayıt “${result.backupKey}” adıyla yedeklendi, örnek sınıf açıldı.`,
+        "error",
+      );
+    } else if (result.status === "unreadable") {
+      persist.current = false;
+      notify(
+        "Kayıtlı sınıf açılamadı ve yedeklenemedi. Üzerine yazılmaması için bu oturumdaki değişiklikler kaydedilmeyecek.",
+        "error",
+      );
+    } else if (result.status === "unavailable") {
+      persist.current = false;
+      notify(
+        "Bu tarayıcıda kayıt alanına erişilemiyor. Değişiklikler yalnızca bu oturumda kalır.",
+        "error",
+      );
     }
     setReady(true);
   }, []);
   useEffect(() => {
-    if (!ready) return;
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(state));
-    } catch {
-      setToast(
+    if (!ready || !persist.current) return;
+    const store = browserStorage();
+    if (store && saveState(store, state)) {
+      saved.current = state;
+      return;
+    }
+    // Undo what could not be saved, so a reload never loses work silently.
+    const last = saved.current;
+    if (last && last !== state) {
+      setState(last);
+      notify(
+        "Değişiklik kaydedilemedi ve geri alındı. Tarayıcı depolama alanı dolu olabilir.",
+        "error",
+      );
+    } else {
+      notify(
         "Değişiklik kaydedilemedi. Tarayıcı depolama alanı dolu olabilir.",
+        "error",
       );
     }
   }, [state, ready]);
   useEffect(() => {
     if (!toast) return;
-    const t = setTimeout(() => setToast(""), 4200);
+    const t = setTimeout(
+      () => setToast(null),
+      toast.tone === "error" ? 8000 : 4200,
+    );
     return () => clearTimeout(t);
   }, [toast]);
   const xp = classXp(state),
@@ -169,6 +214,8 @@ export default function SchoolApp() {
     activeTasks = state.tasks.filter(
       (t) => t.done.length < t.assigned.length,
     ).length;
+  const completed = completedCounts(state),
+    tasksDone = (id: string) => completed.get(id) ?? 0;
   const current = state.students.find((x) => x.id === selected),
     parentChildren = state.students.filter((x) =>
       ["student-0", "student-1"].includes(x.id),
@@ -184,18 +231,19 @@ export default function SchoolApp() {
   }
   function approve(taskId: string, studentId: string) {
     setState((s) => approveTask(s, taskId, studentId));
-    setToast("Görev onaylandı. XP ve yem öğrencinin hesabına eklendi.");
+    notify("Görev onaylandı. XP ve yem öğrencinin hesabına eklendi.");
   }
   function feedAll() {
     if (feed === 0) {
-      setToast(
+      notify(
         "Yemler bitti. Görevleri tamamlayarak yeni yem kazanabilirsiniz.",
+        "error",
       );
       return;
     }
     setState(feedStudents);
     setFeeding((x) => x + 1);
-    setToast("Her balığın mevcut yeminden 1 yem kullanıldı. Afiyet olsun!");
+    notify("Her balığın mevcut yeminden 1 yem kullanıldı. Afiyet olsun!");
   }
   function toggleDecor(i: number) {
     if (xp < decorThresholds[i]) return;
@@ -205,6 +253,15 @@ export default function SchoolApp() {
         ? s.decorations.filter((x) => x !== i)
         : [...s.decorations, i],
     }));
+  }
+  function closeProfile() {
+    setSelected(null);
+    setRemoving(null);
+  }
+  function removeFromClass(student: Student) {
+    setState((s) => removeStudent(s, student.id));
+    closeProfile();
+    notify(`${student.name} sınıftan çıkarıldı.`);
   }
   const stats = (
     <div className="stats">
@@ -449,7 +506,7 @@ export default function SchoolApp() {
                   className="role-switch"
                   onClick={() => {
                     setRole(role === "teacher" ? "parent" : "teacher");
-                    setSelected(null);
+                    closeProfile();
                   }}
                 >
                   <span>
@@ -627,7 +684,8 @@ export default function SchoolApp() {
                               <div className="student-numbers">
                                 <span>{s.xp} XP</span>
                                 <span>
-                                  {s.completed} görev <ChevronRight size={14} />
+                                  {tasksDone(s.id)} görev{" "}
+                                  <ChevronRight size={14} />
                                 </span>
                               </div>
                             </button>
@@ -833,24 +891,17 @@ export default function SchoolApp() {
                         </div>
                       </div>
                       <div className="decor-grid">
-                        {[
-                          ["İlk adım", 1],
-                          ["Deniz kaşifi", 5],
-                          ["Görev ustası", 10],
-                          ["Derin deniz uzmanı", 20],
-                          ["Sınıf yıldızı", 35],
-                          ["Okyanus efsanesi", 50],
-                        ].map(([name, threshold], i) => (
+                        {badges.map(({ name, tasks }, i) => (
                           <div className="card badge-card" key={name}>
                             <span className={`medal medal-${i % 3}`}>
                               <Award size={42} />
                             </span>
                             <h3>{name}</h3>
-                            <p>{threshold} görev tamamla</p>
+                            <p>{tasks} görev tamamla</p>
                             <span className="tiny-tag">
                               {
                                 state.students.filter(
-                                  (x) => x.completed >= Number(threshold),
+                                  (x) => tasksDone(x.id) >= tasks,
                                 ).length
                               }{" "}
                               öğrenci kazandı
@@ -936,7 +987,7 @@ export default function SchoolApp() {
                             ...s,
                             note: String(data.get("note")),
                           }));
-                          setToast("Öğretmen notu güncellendi.");
+                          notify("Öğretmen notu güncellendi.");
                         }}
                       >
                         <textarea
@@ -972,7 +1023,7 @@ export default function SchoolApp() {
                       <label className="child-select">
                         <select
                           aria-label="Çocuk seç"
-                          value={child}
+                          value={parentStudent.id}
                           onChange={(e) => setChild(e.target.value)}
                         >
                           {parentChildren.map((s) => (
@@ -992,7 +1043,7 @@ export default function SchoolApp() {
                   <div className="stats">
                     <Metric
                       icon={CheckCheck}
-                      value={String(parentStudent.completed)}
+                      value={String(tasksDone(parentStudent.id))}
                       label="Tamamlanan görev"
                       color="green"
                     />
@@ -1011,9 +1062,7 @@ export default function SchoolApp() {
                     <Metric
                       icon={Award}
                       value={String(
-                        [1, 5, 10, 20, 35, 50].filter(
-                          (x) => parentStudent.completed >= x,
-                        ).length,
+                        earnedBadges(tasksDone(parentStudent.id)).length,
                       )}
                       label="Kazanılan rozet"
                       color="purple"
@@ -1084,6 +1133,11 @@ export default function SchoolApp() {
                   </section>
                 </>
               )}
+              {role === "parent" && !parentStudent && (
+                <div className="card empty-state">
+                  Bu örnek veli hesabına bağlı öğrenci kalmadı.
+                </div>
+              )}
               <footer className="page-footer">
                 <span>
                   <Waves size={17} />
@@ -1118,12 +1172,13 @@ export default function SchoolApp() {
                   text: `${s.name}, sınıf denizimize katıldı.`,
                   kind: "student" as const,
                   time: "Az önce",
+                  studentId: s.id,
                 },
                 ...old.activities,
               ].slice(0, 20),
             }));
             setModal(null);
-            setToast("Yeni deniz arkadaşımız sınıfa katıldı.");
+            notify("Yeni deniz arkadaşımız sınıfa katıldı.");
           }}
         />
       )}
@@ -1135,16 +1190,12 @@ export default function SchoolApp() {
             setState((old) => ({ ...old, tasks: [task, ...old.tasks] }));
             setModal(null);
             navigate("tasks");
-            setToast("Yeni görev öğrencilere atandı.");
+            notify("Yeni görev öğrencilere atandı.");
           }}
         />
       )}
       {current && (
-        <Modal
-          title="Öğrencinin hikâyesi"
-          onClose={() => setSelected(null)}
-          wide
-        >
+        <Modal title="Öğrencinin hikâyesi" onClose={closeProfile} wide>
           <div className="profile-hero">
             <Avatar student={current} large />
             <div>
@@ -1158,6 +1209,48 @@ export default function SchoolApp() {
             </div>
             <Fish type={current.fish} />
           </div>
+          {role === "teacher" &&
+            (removing === current.id ? (
+              <div className="remove-confirm">
+                <p>
+                  <strong>{current.name}</strong> sınıftan çıkarılsın mı?
+                  XP’si, yemi, görev ve etkinlik kayıtları silinir; yalnızca bu
+                  öğrenciye verilen görevler de kaldırılır. Bu işlem geri
+                  alınamaz.
+                </p>
+                <div>
+                  <button
+                    className="secondary"
+                    onClick={() => setRemoving(null)}
+                  >
+                    Vazgeç
+                  </button>
+                  <button
+                    className="danger-button"
+                    onClick={() => removeFromClass(current)}
+                  >
+                    Evet, sınıftan çıkar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="profile-actions">
+                <button
+                  className="secondary"
+                  onClick={() => setModal("edit-student")}
+                >
+                  <Pencil size={15} />
+                  Bilgileri düzenle
+                </button>
+                <button
+                  className="danger-link"
+                  onClick={() => setRemoving(current.id)}
+                >
+                  <Trash2 size={15} />
+                  Sınıftan çıkar
+                </button>
+              </div>
+            ))}
           <div className="profile-metrics">
             <div>
               <strong>{current.xp}</strong>
@@ -1168,28 +1261,19 @@ export default function SchoolApp() {
               <span>Yem</span>
             </div>
             <div>
-              <strong>{current.completed}</strong>
+              <strong>{tasksDone(current.id)}</strong>
               <span>Tamamlanan görev</span>
             </div>
           </div>
           <h3>Kazanılan rozetler</h3>
           <div className="earned-badges">
-            {[
-              ["İlk adım", 1],
-              ["Deniz kaşifi", 5],
-              ["Görev ustası", 10],
-              ["Derin deniz uzmanı", 20],
-              ["Sınıf yıldızı", 35],
-              ["Okyanus efsanesi", 50],
-            ]
-              .filter(([, n]) => current.completed >= Number(n))
-              .map(([name]) => (
-                <span key={name}>
-                  <Award size={20} />
-                  {name}
-                </span>
-              ))}
-            {current.completed === 0 && (
+            {earnedBadges(tasksDone(current.id)).map(({ name }) => (
+              <span key={name}>
+                <Award size={20} />
+                {name}
+              </span>
+            ))}
+            {tasksDone(current.id) === 0 && (
               <p>İlk görev, ilk rozetin başlangıcı.</p>
             )}
           </div>
@@ -1229,11 +1313,32 @@ export default function SchoolApp() {
           )}
         </Modal>
       )}
+      {modal === "edit-student" && current && (
+        <StudentForm
+          student={current}
+          count={state.students.length}
+          onClose={() => setModal(null)}
+          onSave={(s) => {
+            setState((old) =>
+              updateStudent(old, s.id, { name: s.name, photo: s.photo }),
+            );
+            setModal(null);
+            notify("Öğrenci bilgileri güncellendi.");
+          }}
+        />
+      )}
       {toast && (
-        <div className="toast" role="status">
-          <Check size={18} />
-          {toast}
-          <button aria-label="Bildirimi kapat" onClick={() => setToast("")}>
+        <div
+          className={`toast ${toast.tone === "error" ? "toast-error" : ""}`}
+          role={toast.tone === "error" ? "alert" : "status"}
+        >
+          {toast.tone === "error" ? (
+            <CircleAlert size={18} />
+          ) : (
+            <Check size={18} />
+          )}
+          {toast.text}
+          <button aria-label="Bildirimi kapat" onClick={() => setToast(null)}>
             <X size={16} />
           </button>
         </div>
