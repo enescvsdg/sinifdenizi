@@ -4,7 +4,7 @@ Referans görseller temel alınarak hazırlanmış Next.js, React ve TypeScript 
 
 ## Çalıştırma
 
-Node.js 24 kullanın.
+Node.js 24 kullanın (`.nvmrc`); en az 22.6 gerekir.
 
 ```sh
 npm ci
@@ -16,11 +16,17 @@ Yerel adres: http://127.0.0.1:3000
 ```sh
 npm test
 npm run typecheck
+npm run lint
+npm run format:check
 npm run build
 npm start
 ```
 
 `npm start`, `out/` içindeki üretim derlemesini 4173 portunda sunar. GitHub Pages derlemesi `NEXT_PUBLIC_BASE_PATH=/sinifdenizi` ile yapılır; workflow yalnızca derlenmiş `out/` klasörünü yayımlar.
+
+`npm run format` tüm dosyaları Prettier ile biçimlendirir (`legacy/` hariç). `npm run lint`, eslint-config-next'in Next.js, React Hooks ve erişilebilirlik kurallarını oxlint ile çalıştırır; ESLint'in TypeScript eklentisi bu depodaki TypeScript 7'yi henüz desteklemediği için ESLint kullanılmaz. Ayarlar `.oxlintrc.json` içindedir.
+
+Her pull request'te ve `main` dalına her gönderimde `.github/workflows/ci.yml` çalışır: biçim, lint, tip denetimi ve birim testleri; ardından `/sinifdenizi` alt yoluyla derleme ve Playwright Chromium ile tarayıcı testi. Tarayıcı testi başarısız olursa ekran görüntüleri iş akışının çıktılarına eklenir.
 
 ## Bu aşamada çalışanlar
 

@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Format, lint, types and unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Prettier
+        run: npm run format:check
+      - name: Lint
+        run: npm run lint
+      - name: Types
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+
+  browser:
+    name: Build and browser test
+    runs-on: ubuntu-latest
+    env:
+      # Built and served the way GitHub Pages serves it.
+      NEXT_PUBLIC_BASE_PATH: /sinifdenizi
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Start the preview server
+        run: |
+          npm start > preview.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:4173/sinifdenizi/ > /dev/null && exit 0
+            sleep 1
+          done
+          cat preview.log
+          exit 1
+      - name: Browser test
+        run: npm run test:e2e
+        env:
+          BROWSER_CHANNEL: chromium
+          APP_URL: http://127.0.0.1:4173/sinifdenizi/
+      - name: Keep the screenshots of a failed run
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: test-results/
+          if-no-files-found: ignore
