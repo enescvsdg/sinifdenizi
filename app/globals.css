@@ -7,10 +7,20 @@
 @import "@fontsource/dm-sans/500.css";
 @import "@fontsource/dm-sans/600.css";
 :root {
+  /* Brand palette (design-reference/01-brand-guide.jpg). */
+  --brand-deep: #0b6ef3; /* Derin Mavi; white text on it is 4.6:1 */
+  --brand-sky: #38bdf8; /* Açık Mavi */
+  --brand-teal: #14b8a6; /* Turkuaz */
+  --brand-coral: #f97316; /* Mercan Turuncu */
+  --brand-sun: #facc15; /* Sıcak Sarı */
+  --brand-mist: #e0f2fe; /* Açık Zemin */
+  /* Darker shades of the same hues for text (at least 4.5:1 on white). */
+  --brand-deep-text: #0a5fc9;
+  --brand-teal-text: #0f766e;
+  --brand-coral-text: #c2410c;
+  --brand-sun-text: #a16207;
   --navy: #112f4e;
-  --muted: #7b8b9e;
-  --blue: #087ff5;
-  --teal: #10ac9b;
+  --muted: #657589;
   --line: #e8edf4;
   --bg: #f4f8fc;
   --font: "DM Sans", sans-serif;
@@ -46,11 +56,12 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 summary:focus-visible {
-  outline: 3px solid #42bde8;
+  outline: 3px solid var(--brand-deep);
   outline-offset: 4px;
 }
 a {
   color: inherit;
+  text-decoration: none;
 }
 h1,
 h2,
@@ -86,7 +97,7 @@ h4 {
   font-weight: 900;
 }
 small {
-  font-size: 11px;
+  font-size: 12px;
 }
 svg {
   flex-shrink: 0;
@@ -105,6 +116,7 @@ svg {
   position: sticky;
   top: 0;
   height: 100vh;
+  overflow-y: auto;
   z-index: 25;
 }
 .brand {
@@ -117,16 +129,16 @@ svg {
   white-space: nowrap;
 }
 .brand > div > span {
-  color: #0b91d1;
+  color: var(--brand-deep);
 }
 .brand small {
-  font-size: 8.5px;
+  font-size: 12px;
   font-family: var(--font);
   font-weight: 500;
   letter-spacing: 0.7px;
   display: block;
   margin-top: 2px;
-  color: #7b90a5;
+  color: #60768d;
 }
 .brand-mark {
   width: 41px;
@@ -149,9 +161,9 @@ svg {
   color: #079bd0;
 }
 .school-label {
-  color: #9aaabc;
-  font-size: 9px;
-  letter-spacing: 1.5px;
+  color: #607790;
+  font-size: 12px;
+  letter-spacing: 1px;
   font-weight: 600;
   margin: 42px 12px 14px;
 }
@@ -160,38 +172,38 @@ svg {
   flex-direction: column;
   gap: 6px;
 }
-.sidebar nav button {
+.sidebar nav a {
   height: 45px;
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 0 14px;
-  color: #718399;
+  color: #5d6d82;
   border-radius: 11px;
   text-align: left;
   font-size: 12px;
   font-weight: 500;
   position: relative;
 }
-.sidebar nav button:hover {
+.sidebar nav a:hover {
   background: #f5f9fc;
 }
-.sidebar nav button.active {
+.sidebar nav a.active {
   background: #e9f4ff;
-  color: #087cf0;
+  color: var(--brand-deep-text);
   font-weight: 600;
 }
-.sidebar nav button.active:before {
+.sidebar nav a.active:before {
   content: "";
   width: 3px;
   height: 22px;
-  background: #1186ff;
+  background: var(--brand-deep);
   position: absolute;
   left: -17px;
   border-radius: 0 3px 3px 0;
 }
 .sidebar nav small {
-  font-size: 10px;
+  font-size: 12px;
   background: #eef2f7;
   border-radius: 6px;
   padding: 3px 6px;
@@ -209,7 +221,9 @@ svg {
   background: linear-gradient(150deg, #ecf8ff, #e0f7f8);
   border: 1px solid #e0f1f9;
   border-radius: 14px;
-  padding: 17px 15px 62px;
+  padding: 17px 15px 76px;
+  /* Keep room for the fish; the sidebar scrolls on short screens instead. */
+  flex-shrink: 0;
   position: relative;
   overflow: hidden;
 }
@@ -224,8 +238,8 @@ svg {
   margin: 8px 0;
 }
 .sidebar-story > span {
-  font-size: 9px;
-  color: #7c98a9;
+  font-size: 12px;
+  color: #557081;
 }
 .story-fish {
   position: absolute;
@@ -247,13 +261,13 @@ svg {
 .sidebar-bottom {
   margin-top: auto;
 }
-.sidebar-bottom > button {
+.sidebar-bottom > a {
   display: flex;
   align-items: center;
   gap: 13px;
   width: 100%;
   padding: 11px 14px;
-  color: #8593a4;
+  color: #667589;
   font-size: 12px;
 }
 .teacher-profile {
@@ -266,12 +280,12 @@ svg {
 }
 .teacher-profile strong {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
 }
 .teacher-profile small {
   display: block;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 12px;
   margin-top: 4px;
 }
 .teacher-profile > svg {
@@ -285,7 +299,7 @@ svg {
   height: 36px;
   border-radius: 50%;
   background: #f2e1d1;
-  color: #9b623e;
+  color: #8b5837;
   font-size: 12px;
   font-weight: 700;
   box-shadow: inset 0 0 0 3px #fff;
@@ -293,7 +307,7 @@ svg {
 .teacher-avatar.small {
   width: 33px;
   height: 33px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .topbar {
   height: 74px;
@@ -309,8 +323,8 @@ svg {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 11px;
-  color: #97a4b3;
+  font-size: 12px;
+  color: #65768a;
 }
 .breadcrumb strong {
   color: #60758b;
@@ -322,14 +336,14 @@ svg {
   gap: 20px;
 }
 .demo-pill {
-  font-size: 9px;
+  font-size: 12px;
   border: 1px solid #d8eae8;
-  color: #648f86;
+  color: #567b74;
   border-radius: 20px;
   padding: 5px 9px;
 }
 .role-switch {
-  font-size: 10px;
+  font-size: 12px;
   color: #5f7690;
   display: flex;
   align-items: center;
@@ -373,19 +387,19 @@ svg {
   margin-bottom: 25px;
 }
 .eyebrow {
-  font-size: 9px;
-  letter-spacing: 1.7px;
+  font-size: 12px;
+  letter-spacing: 1px;
   font-weight: 700;
-  color: #85a0b4;
+  color: #55748b;
   display: block;
   margin-bottom: 7px;
 }
 .page-heading .eyebrow {
-  color: #2ca9b7;
+  color: var(--brand-teal-text);
 }
 .page-heading p {
   font-size: 12px;
-  color: #8494a5;
+  color: #607284;
   margin-top: 9px;
 }
 .heading-actions {
@@ -401,7 +415,7 @@ svg {
   border: 1px solid #e1e8f1;
   background: white;
   border-radius: 9px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .class-selector svg {
   color: #75a0c0;
@@ -409,7 +423,8 @@ svg {
 .primary,
 .secondary,
 .feed-button,
-.selected-button {
+.selected-button,
+.danger-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -417,19 +432,19 @@ svg {
   min-height: 37px;
   padding: 10px 16px;
   border-radius: 9px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   transition:
     background 0.15s,
     transform 0.15s;
 }
 .primary {
-  background: #0b83f5;
+  background: var(--brand-deep);
   color: white;
-  box-shadow: 0 4px 10px #0b83f525;
+  box-shadow: 0 4px 10px #0b6ef325;
 }
 .primary:hover {
-  background: #006cdd;
+  background: var(--brand-deep-text);
 }
 .secondary {
   border: 1px solid #e1e9f2;
@@ -442,14 +457,35 @@ svg {
 .feed-button {
   background: #fff2e6;
   border: 1px solid #ffdfbc;
-  color: #c27a29;
+  color: var(--brand-coral-text);
 }
 .feed-button:hover {
   background: #ffe8cc;
 }
 .selected-button {
   background: #e7f7f0;
-  color: #13a180;
+  color: #0e7a61;
+}
+.danger-button {
+  background: #c2412d;
+  color: white;
+}
+.danger-button:hover {
+  background: #a8351f;
+}
+.danger-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 37px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #b3361f;
+}
+.danger-link:hover {
+  background: #fff1ee;
 }
 .card {
   background: #fff;
@@ -480,8 +516,8 @@ svg {
   letter-spacing: -0.4px;
 }
 .metric div > span {
-  font-size: 10px;
-  color: #8b9aab;
+  font-size: 12px;
+  color: #64768a;
   display: block;
   margin-top: 5px;
 }
@@ -544,9 +580,9 @@ svg {
   font-size: 18px;
 }
 .ocean-title p {
-  font-size: 9px;
+  font-size: 12px;
   margin-top: 4px;
-  color: #8d9cac;
+  color: #65778a;
 }
 .ocean-title .icon-tile {
   width: 37px;
@@ -564,7 +600,7 @@ svg {
   color: #bb8f35;
 }
 .class-level strong {
-  font-size: 10px;
+  font-size: 12px;
   color: #876e39;
   display: block;
   white-space: nowrap;
@@ -592,12 +628,12 @@ svg {
   top: 18px;
   left: 20px;
   color: #ecfbff;
-  font-size: 8px;
-  letter-spacing: 1.1px;
+  font-size: 12px;
+  letter-spacing: 1px;
   display: flex;
   align-items: center;
   gap: 7px;
-  background: #044f7766;
+  background: #043b5ccc;
   border: 1px solid #ffffff25;
   padding: 7px 10px;
   border-radius: 6px;
@@ -615,33 +651,15 @@ svg {
 .aquarium-caption-separator {
   opacity: 0.4;
 }
-.water-rays {
-  position: absolute;
-  inset: 0;
-  background: repeating-conic-gradient(
-    from 161deg at 50% -20%,
-    transparent 0deg 11deg,
-    #a1efff0a 12deg 15deg,
-    transparent 16deg 25deg
-  );
-  pointer-events: none;
-  z-index: 3;
-}
-.fish-sprite {
-  display: block;
-  background-size: 400% 300%;
-  background-repeat: no-repeat;
-  width: 100px;
-  height: 100px;
-  flex-shrink: 0;
-}
+.fish-sprite,
 .decor-sprite {
   display: block;
-  background-size: 300% 300%;
-  background-repeat: no-repeat;
   width: 100px;
   height: 100px;
+  object-fit: contain;
   flex-shrink: 0;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .scene-decor {
   position: absolute;
@@ -652,25 +670,30 @@ svg {
 }
 .swimmer {
   position: absolute;
+  /* Moved by a transform written every frame (see components/aquarium.tsx). */
+  left: 0;
+  top: 0;
+  will-change: transform;
   aspect-ratio: 1;
   height: auto;
-  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  transform: translate(-50%, -50%);
   padding: 0;
   outline-offset: -2px;
   min-width: 48px;
   max-width: 120px;
   -webkit-tap-highlight-color: transparent;
 }
+/* Until the first frame places it, a fish would sit in the corner. */
+.swimmer:not([data-depth]) {
+  visibility: hidden;
+}
 .swimmer .fish-sprite {
   width: 100%;
   height: 100%;
   position: absolute;
   inset: 0;
-  transform: scaleX(var(--direction, 1)) rotate(var(--tilt, 0deg));
   filter: drop-shadow(0 7px 5px #063f5b55);
-  transition:
-    transform 0.55s ease,
-    filter 0.2s;
+  transition: filter 0.2s;
 }
 .swimmer:hover .fish-sprite,
 .swimmer:focus-visible .fish-sprite {
@@ -692,7 +715,7 @@ svg {
 }
 .fish-label small {
   display: block;
-  font-size: 9px;
+  font-size: 12px;
   color: #718d9f;
   margin-top: 3px;
 }
@@ -702,12 +725,9 @@ svg {
   border: 1px solid #dcffff55;
   box-shadow: inset 1px 1px 2px #ffffff77;
   border-radius: 100%;
-  animation: bubble-rise 12s linear infinite;
+  animation: ocean-bubble-rise 12s linear infinite;
   z-index: 3;
   pointer-events: none;
-}
-.paused {
-  animation-play-state: paused;
 }
 .food {
   position: absolute;
@@ -716,7 +736,7 @@ svg {
   background: #ffc15f;
   border-radius: 50%;
   top: 0;
-  animation: food-fall 2s ease-in forwards;
+  animation: ocean-food-fall 2s ease-in forwards;
   z-index: 12;
 }
 .aquarium-bottom {
@@ -729,21 +749,23 @@ svg {
   justify-content: space-between;
   align-items: center;
   color: #f3fcff;
-  font-size: 8px;
+  font-size: 12px;
   gap: 10px;
 }
 .aquarium-bottom > span {
   display: flex;
   gap: 6px;
   align-items: center;
-  text-shadow: 0 1px 3px #004168;
+  padding: 6px 9px;
+  border-radius: 7px;
+  background: #043b5ccc;
 }
 .aquarium-bottom > div {
   display: flex;
   gap: 6px;
 }
 .aquarium-bottom button {
-  background: #07456a88;
+  background: #043b5ccc;
   border: 1px solid #ffffff40;
   color: white;
   border-radius: 7px;
@@ -751,7 +773,7 @@ svg {
   display: flex;
   gap: 6px;
   align-items: center;
-  font-size: 9px;
+  font-size: 12px;
   backdrop-filter: blur(8px);
 }
 .aquarium-toolbar {
@@ -759,8 +781,8 @@ svg {
   align-items: center;
   justify-content: space-between;
   padding: 13px 18px;
-  font-size: 10px;
-  color: #8a9ca8;
+  font-size: 12px;
+  color: #637785;
 }
 .aquarium-toolbar > div {
   display: flex;
@@ -769,7 +791,7 @@ svg {
 }
 .aquarium-toolbar .secondary,
 .aquarium-toolbar .feed-button {
-  font-size: 10px;
+  font-size: 12px;
   min-height: 33px;
   padding: 8px 12px;
 }
@@ -805,16 +827,16 @@ svg {
   margin-left: -7px;
 }
 .goal-visual .eyebrow {
-  font-size: 7px;
-  letter-spacing: 1.2px;
+  font-size: 12px;
+  letter-spacing: 1px;
   margin-bottom: 5px;
 }
 .goal-visual h4 {
   font-size: 15px;
 }
 .goal-visual p {
-  font-size: 9px;
-  color: #9bafba;
+  font-size: 12px;
+  color: #5d7887;
   margin-top: 5px;
 }
 .progress {
@@ -827,36 +849,36 @@ svg {
   display: block;
   height: 100%;
   border-radius: 8px;
-  background: linear-gradient(90deg, #27bfb2, #45d2b9);
+  background: linear-gradient(90deg, var(--brand-teal), #2dd4bf);
   transition: width 0.4s;
 }
 .goal-numbers {
   display: flex;
   justify-content: space-between;
-  font-size: 8px;
-  color: #8d9fac;
+  font-size: 12px;
+  color: #617786;
   margin-top: 7px;
 }
 .text-button {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  color: #3397dc;
+  color: var(--brand-deep-text);
   padding: 0;
 }
 .goal-card > .text-button {
   margin-top: 16px;
-  font-size: 9px;
+  font-size: 12px;
 }
 .activity-card {
   padding: 18px;
 }
 .tiny-tag {
-  font-size: 8px;
+  font-size: 12px;
   background: #f0f7fc;
-  color: #7797af;
+  color: #52738c;
   border-radius: 5px;
   padding: 5px 7px;
   white-space: nowrap;
@@ -899,13 +921,13 @@ svg {
   background: #eef5ff;
 }
 .activity p {
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
   color: #60758c;
 }
 .activity small {
-  font-size: 8px;
-  color: #a3b0bc;
+  font-size: 12px;
+  color: #647789;
   display: block;
   margin-top: 4px;
 }
@@ -924,60 +946,15 @@ svg {
   font-size: 12px;
   font-weight: 700;
   line-height: 1.65;
-  color: #6e95ab;
-}
-.collection-card {
-  margin-top: 24px;
-  padding: 22px;
-}
-.collection-card .eyebrow {
-  font-size: 8px;
-}
-.collection-card h2 {
-  font-size: 19px;
-}
-.fish-collection {
-  display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 15px;
-}
-.collection-fish {
-  padding: 7px 2px 13px;
-  border: 1px solid #edf3f8;
-  border-radius: 11px;
-  background: linear-gradient(#f5fbff, #fff);
-  transition: transform 0.2s;
-}
-.collection-fish:hover {
-  transform: translateY(-4px);
-  background: #edf9ff;
-}
-.collection-fish > .fish-sprite {
-  width: 86%;
-  height: auto;
-  aspect-ratio: 1;
-  margin: auto;
-}
-.collection-fish strong {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  margin-top: 4px;
-}
-.collection-fish small {
-  display: block;
-  color: #98a8b6;
-  font-size: 8px;
-  margin-top: 5px;
+  color: #4f7388;
 }
 .page-footer {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #9aafbd;
+  color: #587487;
   padding: 25px 0 7px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .page-footer > span {
   display: flex;
@@ -986,7 +963,7 @@ svg {
 }
 .page-footer small {
   margin-left: auto;
-  font-size: 9px;
+  font-size: 12px;
 }
 .page-footer > svg {
   color: #74b9e3;
@@ -999,8 +976,8 @@ svg {
   gap: 15px;
 }
 .filter-bar > span {
-  font-size: 11px;
-  color: #899daf;
+  font-size: 12px;
+  color: #5c7388;
 }
 .search-field {
   display: flex;
@@ -1048,7 +1025,7 @@ svg {
   justify-content: center;
   overflow: hidden;
   font-size: 12px;
-  color: #627591;
+  color: #56667f;
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -1068,8 +1045,8 @@ svg {
   margin: 0 auto;
 }
 .student-card p {
-  font-size: 11px;
-  color: #869fb1;
+  font-size: 12px;
+  color: #5b788d;
   margin: 5px 0 18px;
 }
 .student-numbers {
@@ -1077,8 +1054,8 @@ svg {
   align-items: center;
   justify-content: space-between;
   margin-top: 9px;
-  font-size: 9px;
-  color: #90a4b5;
+  font-size: 12px;
+  color: #5e788d;
 }
 .student-numbers > span:last-child {
   display: flex;
@@ -1095,11 +1072,11 @@ svg {
 .tabs button {
   padding: 9px 18px;
   border-radius: 7px;
-  font-size: 11px;
-  color: #7d94a9;
+  font-size: 12px;
+  color: #576e83;
 }
 .tabs .active {
-  color: #258eec;
+  color: #1275cf;
   background: #fff;
   box-shadow: 0 2px 5px #52637d10;
 }
@@ -1120,29 +1097,28 @@ svg {
   flex: 1;
 }
 .task-heading p {
-  color: #8d9bad;
-  font-size: 11px;
+  color: #64768c;
+  font-size: 12px;
   margin-top: 7px;
 }
 .task-heading .eyebrow {
-  font-size: 8px;
-  color: #27ac9a;
+  font-size: 12px;
+  color: var(--brand-teal-text);
 }
 .reward {
   background: #fff7e9;
   border: 1px solid #f5e7cc;
-  color: #b58b3f;
+  color: var(--brand-sun-text);
   padding: 10px 13px;
   border-radius: 9px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   display: inline-block;
 }
 .reward small {
   display: block;
-  font-size: 9px;
+  font-size: 12px;
   margin-top: 3px;
-  opacity: 0.7;
 }
 .task-progress {
   display: flex;
@@ -1157,8 +1133,8 @@ svg {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 10px;
-  color: #889caf;
+  font-size: 12px;
+  color: #5f778e;
 }
 .task-card details {
   border-top: 1px solid var(--line);
@@ -1166,12 +1142,12 @@ svg {
 .task-card summary {
   list-style: none;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   display: flex;
   justify-content: space-between;
   padding: 15px 0 0;
-  color: #6685a0;
+  color: #5b7892;
 }
 .approval-list {
   display: grid;
@@ -1188,16 +1164,16 @@ svg {
 }
 .approval-list > div > span:nth-child(2) {
   flex: 1;
-  font-size: 11px;
+  font-size: 12px;
 }
 .approval-list .secondary {
-  font-size: 9px;
+  font-size: 12px;
   padding: 7px;
   min-height: 30px;
 }
 .completed {
-  font-size: 10px;
-  color: #1daa87;
+  font-size: 12px;
+  color: var(--brand-teal-text);
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -1205,8 +1181,14 @@ svg {
 }
 .pending {
   color: #bf9753;
-  font-size: 10px;
+  font-size: 12px;
   white-space: nowrap;
+}
+.decor-intro > div {
+  min-width: 0;
+}
+.decor-intro .reward {
+  white-space: normal;
 }
 .decor-intro {
   display: flex;
@@ -1221,7 +1203,7 @@ svg {
 }
 .decor-intro p {
   font-size: 12px;
-  color: #7d9aad;
+  color: #547185;
   margin: 8px 0 19px;
 }
 .decor-intro > .decor-sprite {
@@ -1244,7 +1226,7 @@ svg {
   align-items: center;
   background: #f2f5fa;
   color: #95a4b5;
-  font-size: 9px;
+  font-size: 12px;
   padding: 5px 7px;
   border-radius: 6px;
   position: absolute;
@@ -1252,7 +1234,7 @@ svg {
   top: 14px;
 }
 .decor-state.unlocked {
-  color: #21a589;
+  color: #197d67;
   background: #ecf9f4;
 }
 .decor-card > .decor-sprite {
@@ -1265,8 +1247,8 @@ svg {
   opacity: 0.4;
 }
 .decor-card p {
-  color: #90a0b1;
-  font-size: 10px;
+  color: #63778d;
+  font-size: 12px;
   margin: 6px 0 18px;
 }
 .decor-card button {
@@ -1279,12 +1261,12 @@ svg {
   align-items: center;
   margin-bottom: 25px;
   background: #fff9eb;
-  color: #aa8235;
+  color: #8d6c2c;
 }
 .badge-intro p {
   margin-top: 7px;
   font-size: 12px;
-  color: #a3997e;
+  color: #7b7157;
 }
 .badge-card {
   text-align: center;
@@ -1308,28 +1290,95 @@ svg {
 }
 .badge-card p {
   margin: 8px 0 16px;
-  color: #8d9fac;
-  font-size: 11px;
+  color: #617786;
+  font-size: 12px;
 }
 .reports-layout {
   display: grid;
-  grid-template-columns: 1.25fr 1fr;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
   gap: 22px;
 }
 .report-card {
   padding: 25px;
+}
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 264px;
+  gap: 20px;
+}
+.dashboard-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.quick-actions,
+.pending-tasks {
+  padding: 22px;
+}
+.quick-actions h2,
+.pending-tasks h2 {
+  font-size: 18px;
+}
+.quick-actions > div {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.quick-actions > div > * {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  transition:
+    transform 0.15s,
+    border-color 0.15s;
+}
+.quick-actions > div > *:hover {
+  transform: translateY(-2px);
+  border-color: #9ed7fd;
+}
+.pending-tasks > div:not(.section-heading) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 160px;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #f1f5fa;
+}
+.pending-tasks > div:last-child {
+  border-bottom: 0;
+}
+.pending-tasks strong {
+  display: block;
+  font-size: 13px;
+}
+.pending-tasks span {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #5d7488;
 }
 .bar-chart {
   display: flex;
   align-items: flex-end;
   justify-content: space-around;
   gap: 20px;
+  /* Many tasks scroll sideways instead of squeezing their titles. */
+  overflow-x: auto;
   height: 300px;
   padding-top: 30px;
 }
 .bar-chart > div {
   flex: 1;
   text-align: center;
+  min-width: 72px;
   max-width: 150px;
 }
 .bar-track {
@@ -1358,13 +1407,16 @@ svg {
   left: 50%;
   transform: translateX(-50%);
   font-style: normal;
-  font-size: 11px;
-  color: #419cce;
+  font-size: 12px;
+  color: #2d7ba8;
+  background: #fff;
+  padding: 0 4px;
+  border-radius: 4px;
 }
 .bar-chart > div > span {
   display: block;
-  font-size: 9px;
-  color: #8b9eaf;
+  font-size: 12px;
+  color: #60778b;
   margin-top: 14px;
   min-height: 35px;
 }
@@ -1379,23 +1431,23 @@ svg {
 }
 .ranking > span:first-child {
   width: 15px;
-  color: #99acba;
-  font-size: 11px;
+  color: #5e778a;
+  font-size: 12px;
 }
 .ranking strong {
   flex: 1;
-  font-size: 11px;
+  font-size: 12px;
 }
 .ranking > span:last-child {
-  font-size: 11px;
-  color: #499ece;
+  font-size: 12px;
+  color: #2d7ba8;
 }
 .settings-card {
   padding: 28px;
   max-width: 780px;
 }
 .settings-card > p {
-  color: #90a2b0;
+  color: #617788;
   font-size: 12px;
   margin-top: 8px;
 }
@@ -1403,8 +1455,8 @@ svg {
   margin: 28px 0 14px;
 }
 .setting-row p {
-  font-size: 11px;
-  color: #90a2b0;
+  font-size: 12px;
+  color: #617788;
   margin-top: 6px;
 }
 .settings-card textarea {
@@ -1416,11 +1468,11 @@ svg {
   display: flex;
   gap: 12px;
   align-items: flex-start;
-  color: #8397a6;
+  color: #5d7282;
   background: #f1f7fb;
   padding: 16px;
   border-radius: 12px;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.8;
   margin-top: 24px;
 }
@@ -1460,13 +1512,13 @@ svg {
 }
 .parent-hero p {
   font-size: 12px;
-  color: #8ba0b1;
+  color: #5a7286;
   margin: 7px 0 18px;
 }
 .parent-hero small {
   display: block;
-  font-size: 9px;
-  color: #8ba0b1;
+  font-size: 12px;
+  color: #5a7286;
   margin-top: 7px;
 }
 .parent-task {
@@ -1483,8 +1535,8 @@ svg {
   font-size: 13px;
 }
 .parent-task small {
-  font-size: 10px;
-  color: #9badbc;
+  font-size: 12px;
+  color: #5f788d;
   display: block;
   margin-top: 5px;
 }
@@ -1500,11 +1552,11 @@ svg {
   font-size: 17px;
   font-weight: 600;
   line-height: 1.9;
-  color: #718da3;
+  color: #587389;
   margin: 17px 0 24px;
 }
 .teacher-note > small {
-  color: #8fa8b8;
+  color: #567588;
 }
 .parent-aquarium {
   margin-top: 24px;
@@ -1609,11 +1661,11 @@ svg {
 }
 .welcome-form > p {
   font-size: 13px;
-  color: #8d9caf;
+  color: #63758d;
   line-height: 1.8;
   margin-bottom: 30px;
 }
-.welcome-form > button {
+.welcome-form > a {
   width: 100%;
   justify-content: space-between;
   margin-bottom: 12px;
@@ -1646,7 +1698,7 @@ svg {
 }
 .modal label {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   margin: 16px 0;
   color: #708799;
@@ -1665,7 +1717,7 @@ svg {
   background: #fbfdff;
 }
 .modal input[type="file"] {
-  font-size: 10px;
+  font-size: 12px;
 }
 .modal textarea {
   resize: vertical;
@@ -1683,34 +1735,6 @@ svg {
   margin-top: 24px;
   border-top: 1px solid var(--line);
   padding-top: 20px;
-}
-.fish-picker {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 9px;
-  margin-top: 14px;
-}
-.fish-picker button {
-  border: 1px solid #edf2f7;
-  border-radius: 10px;
-  padding: 5px;
-  background: #f6fbff;
-}
-.fish-picker button.selected {
-  border-color: #1aa4f1;
-  background: #e8f6ff;
-  box-shadow: 0 0 0 1px #1aa4f1;
-}
-.fish-picker .fish-sprite {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1;
-}
-.fish-picker small {
-  font-size: 8px;
-  color: #6e90a9;
-  display: block;
-  min-height: 22px;
 }
 .form-error {
   color: #d6614c;
@@ -1737,7 +1761,7 @@ svg {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .profile-hero {
   display: flex;
@@ -1751,12 +1775,12 @@ svg {
   flex: 1;
 }
 .profile-hero p {
-  font-size: 11px;
+  font-size: 12px;
   color: #8ba5b5;
   margin: 5px 0 12px;
 }
 .profile-hero small {
-  font-size: 9px;
+  font-size: 12px;
   color: #8ba5b5;
   display: block;
   margin-top: 5px;
@@ -1785,7 +1809,7 @@ svg {
 }
 .profile-metrics span {
   display: block;
-  font-size: 9px;
+  font-size: 12px;
   color: #96a7b6;
   margin-top: 6px;
 }
@@ -1806,7 +1830,7 @@ svg {
   border: 1px solid #f6e9cb;
   border-radius: 9px;
   padding: 9px 12px;
-  font-size: 11px;
+  font-size: 12px;
   color: #b88e37;
 }
 .earned-badges p {
@@ -1820,13 +1844,97 @@ svg {
   gap: 15px;
   border-bottom: 1px solid var(--line);
   padding: 14px 0;
-  font-size: 11px;
+  font-size: 12px;
 }
 .profile-task small {
-  font-size: 9px;
+  font-size: 12px;
   display: block;
   margin-top: 5px;
   color: #93a3b5;
+}
+.task-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: -4px 0 4px;
+}
+.undo-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #33617f;
+  white-space: nowrap;
+}
+.undo-button:hover {
+  background: #eef5fb;
+}
+.profile-task-status {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.overdue {
+  margin-left: 6px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: #fff1ee;
+  color: #a8351f;
+  font-size: 12px;
+  font-weight: 600;
+}
+.form-note {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #5d7488;
+  margin-top: 4px;
+}
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+.remove-confirm {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid #f6d3c9;
+  border-radius: 12px;
+  background: #fff5f2;
+}
+.remove-confirm p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #7a2e21;
+}
+.remove-confirm > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+.photo-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: -6px;
+}
+.photo-preview img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.photo-preview .text-button {
+  font-size: 12px;
+  color: #1f6fb8;
 }
 .toast {
   position: fixed;
@@ -1854,6 +1962,16 @@ svg {
   padding: 0;
   display: flex;
 }
+.toast-error {
+  background: #6b2a1f;
+  border-color: #8f4133;
+}
+.toast-error > svg {
+  color: #ffb4a3;
+}
+.toast-error > button {
+  color: #f3cfc6;
+}
 .muted {
   color: #91a4b5;
   font-size: 12px;
@@ -1867,25 +1985,6 @@ svg {
 .mobile-toggle,
 .nav-scrim {
   display: none;
-}
-@keyframes bubble-rise {
-  from {
-    transform: translateY(0) translateX(0);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  to {
-    transform: translateY(-560px) translateX(25px);
-    opacity: 0;
-  }
-}
-@keyframes food-fall {
-  to {
-    transform: translateY(390px);
-    opacity: 0;
-  }
 }
 @media (min-width: 1600px) {
   .aquarium {
@@ -1917,10 +2016,7 @@ svg {
     font-size: 18px;
   }
   .goal-visual p {
-    font-size: 11px;
-  }
-  .collection-fish > .fish-sprite {
-    max-width: 135px;
+    font-size: 12px;
   }
   .quote-card {
     margin-top: auto;
@@ -1940,12 +2036,12 @@ svg {
   .brand-mark {
     width: 35px;
   }
-  .sidebar nav button {
-    font-size: 11px;
+  .sidebar nav a {
+    font-size: 12px;
     padding-left: 11px;
     gap: 9px;
   }
-  .sidebar nav button.active:before {
+  .sidebar nav a.active:before {
     left: -12px;
   }
   .page-content {
@@ -1991,35 +2087,33 @@ svg {
     padding: 6px;
   }
   .ocean-title p {
-    font-size: 8px;
-  }
-  .fish-collection {
-    gap: 8px;
-  }
-  .collection-fish small {
-    font-size: 7px;
+    font-size: 12px;
   }
   .student-grid {
     grid-template-columns: repeat(3, 1fr);
   }
   .aquarium-toolbar > div:first-child {
-    font-size: 8px;
+    font-size: 12px;
   }
   .aquarium-toolbar .secondary,
   .aquarium-toolbar .feed-button {
-    font-size: 9px;
+    font-size: 12px;
     padding: 8px;
   }
   .aquarium-bottom > span {
-    font-size: 7px;
+    font-size: 12px;
   }
   .topbar-right {
     gap: 13px;
   }
 }
 @media (max-width: 1000px) {
-  .ocean-layout {
+  .ocean-layout,
+  .dashboard-layout {
     grid-template-columns: 1fr;
+  }
+  .quick-actions > div {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .ocean-aside {
     display: grid;
@@ -2055,29 +2149,20 @@ svg {
     font-size: 22px;
   }
   .metric div > span {
-    font-size: 8px;
+    font-size: 12px;
   }
   .heading-actions .primary {
-    font-size: 10px;
+    font-size: 12px;
     padding: 10px 12px;
   }
   .page-heading h1 {
     font-size: 27px;
   }
-  .fish-collection {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  .collection-fish > .fish-sprite {
-    max-width: 100px;
-  }
-  .collection-fish small {
-    font-size: 9px;
-  }
   .decor-grid {
     grid-template-columns: repeat(2, 1fr);
   }
   .reports-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .approval-list {
     grid-template-columns: 1fr;
@@ -2113,12 +2198,18 @@ svg {
     left: 0;
     width: 226px;
     transform: translateX(-100%);
-    transition: transform 0.2s;
+    /* Hidden (and out of the tab order) once it has slid away. */
+    visibility: hidden;
+    transition:
+      transform 0.2s,
+      visibility 0s 0.2s;
     height: 100dvh;
     overflow: auto;
   }
   .nav-open .sidebar {
     transform: translateX(0);
+    visibility: visible;
+    transition: transform 0.2s;
   }
   .nav-open .nav-scrim {
     display: block;
@@ -2136,7 +2227,7 @@ svg {
   }
   .breadcrumb {
     gap: 6px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .breadcrumb > span {
     display: none;
@@ -2148,7 +2239,7 @@ svg {
     display: none;
   }
   .demo-pill {
-    font-size: 8px;
+    font-size: 12px;
     padding: 4px 6px;
   }
   .page-content {
@@ -2164,11 +2255,11 @@ svg {
     max-width: 270px;
   }
   .page-heading .eyebrow {
-    font-size: 8px;
-    letter-spacing: 1.4px;
+    font-size: 12px;
+    letter-spacing: 1px;
   }
   .page-heading p {
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.8;
     max-width: 250px;
   }
@@ -2199,7 +2290,7 @@ svg {
     font-size: 25px;
   }
   .metric div > span {
-    font-size: 9px;
+    font-size: 12px;
   }
   .aquarium {
     height: 390px;
@@ -2219,7 +2310,7 @@ svg {
     height: 33px;
   }
   .ocean-title p {
-    font-size: 8px;
+    font-size: 12px;
     max-width: 145px;
     line-height: 1.6;
   }
@@ -2228,7 +2319,7 @@ svg {
     gap: 5px;
   }
   .class-level strong {
-    font-size: 8px;
+    font-size: 12px;
   }
   .class-level .progress {
     width: 47px;
@@ -2237,7 +2328,7 @@ svg {
     width: 15px;
   }
   .aquarium-caption {
-    font-size: 6px;
+    font-size: 12px;
     top: 13px;
     left: 12px;
     padding: 6px 8px;
@@ -2250,12 +2341,12 @@ svg {
   }
   .aquarium-bottom > span {
     max-width: 145px;
-    font-size: 7px;
+    font-size: 12px;
     line-height: 1.6;
   }
   .aquarium-bottom button {
     padding: 7px;
-    font-size: 8px;
+    font-size: 12px;
   }
   .aquarium-bottom button svg {
     width: 15px;
@@ -2273,7 +2364,7 @@ svg {
   }
   .aquarium-toolbar .secondary,
   .aquarium-toolbar .feed-button {
-    font-size: 10px;
+    font-size: 12px;
     flex: 1;
     min-height: 37px;
   }
@@ -2300,7 +2391,7 @@ svg {
     font-size: 14px;
   }
   .goal-visual .eyebrow {
-    font-size: 6px;
+    font-size: 12px;
   }
   .activity-card .tiny-tag {
     display: none;
@@ -2317,61 +2408,25 @@ svg {
     width: 14px;
   }
   .activity p {
-    font-size: 9px;
+    font-size: 12px;
   }
   .activity small {
-    font-size: 7px;
+    font-size: 12px;
   }
   .quote-card {
     display: none;
   }
   .goal-card > .text-button {
-    font-size: 8px;
+    font-size: 12px;
     gap: 2px;
     margin-top: 12px;
   }
-  .collection-card {
-    padding: 16px;
-    margin-top: 18px;
-  }
-  .collection-card h2 {
-    font-size: 16px;
-  }
-  .collection-card .eyebrow {
-    font-size: 6px;
-  }
-  .collection-card .section-heading {
-    align-items: flex-end;
-  }
-  .collection-card .text-button {
-    font-size: 8px;
-    white-space: nowrap;
-    gap: 3px;
-  }
-  .collection-card .text-button svg {
-    width: 13px;
-  }
-  .fish-collection {
-    gap: 8px;
-    grid-template-columns: repeat(4, 1fr);
-  }
-  .collection-fish {
-    padding-bottom: 10px;
-  }
-  .collection-fish strong {
-    font-size: 9px;
-  }
-  .collection-fish small {
-    font-size: 6px;
-    line-height: 1.5;
-    min-height: 18px;
-  }
   .page-footer {
-    font-size: 8px;
+    font-size: 12px;
     gap: 4px;
   }
   .page-footer small {
-    font-size: 7px;
+    font-size: 12px;
   }
   .page-footer svg {
     width: 12px;
@@ -2385,7 +2440,7 @@ svg {
     width: 100%;
   }
   .filter-bar > span {
-    font-size: 10px;
+    font-size: 12px;
   }
   .student-grid {
     gap: 12px;
@@ -2401,16 +2456,16 @@ svg {
     font-size: 13px;
   }
   .student-card p {
-    font-size: 9px;
+    font-size: 12px;
   }
   .student-top .tiny-tag {
-    font-size: 7px;
+    font-size: 12px;
     padding: 4px;
   }
   .student-top .avatar {
     width: 30px;
     height: 30px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .task-card {
     padding: 17px;
@@ -2430,12 +2485,12 @@ svg {
     font-size: 13px;
   }
   .task-heading p {
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.6;
   }
   .reward {
     padding: 7px 8px;
-    font-size: 9px;
+    font-size: 12px;
     white-space: nowrap;
   }
   .task-progress {
@@ -2446,7 +2501,7 @@ svg {
     flex-basis: 100%;
   }
   .task-progress > span {
-    font-size: 9px;
+    font-size: 12px;
   }
   .task-progress > span:last-child {
     margin-left: auto;
@@ -2459,7 +2514,7 @@ svg {
     font-size: 23px;
   }
   .decor-intro p {
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.7;
   }
   .decor-intro > .decor-sprite {
@@ -2467,7 +2522,7 @@ svg {
     height: 90px;
   }
   .decor-intro .eyebrow {
-    font-size: 7px;
+    font-size: 12px;
   }
   .decor-grid {
     gap: 12px;
@@ -2481,7 +2536,7 @@ svg {
     margin-top: 15px;
   }
   .decor-state {
-    font-size: 7px;
+    font-size: 12px;
     left: 10px;
     top: 10px;
   }
@@ -2489,12 +2544,12 @@ svg {
     font-size: 13px;
   }
   .decor-card p {
-    font-size: 8px;
+    font-size: 12px;
     min-height: 24px;
     line-height: 1.6;
   }
   .decor-card button {
-    font-size: 9px;
+    font-size: 12px;
     padding: 9px 5px;
   }
   .badge-card {
@@ -2507,11 +2562,15 @@ svg {
     font-size: 18px;
   }
   .badge-intro p {
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.7;
   }
   .report-card {
     padding: 20px;
+  }
+  .pending-tasks > div:not(.section-heading) {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
   .report-card h2 {
     font-size: 18px;
@@ -2546,21 +2605,21 @@ svg {
     width: 16px;
   }
   .parent-hero .eyebrow {
-    font-size: 7px;
+    font-size: 12px;
   }
   .parent-hero p {
-    font-size: 10px;
+    font-size: 12px;
     margin-bottom: 10px;
   }
   .parent-task h3 {
-    font-size: 11px;
+    font-size: 12px;
   }
   .parent-task small {
-    font-size: 8px;
+    font-size: 12px;
   }
   .parent-task .completed,
   .parent-task .pending {
-    font-size: 8px;
+    font-size: 12px;
   }
   .parent-task .icon-tile {
     width: 29px;
@@ -2573,7 +2632,7 @@ svg {
     font-size: 17px;
   }
   .parent-aquarium .tiny-tag {
-    font-size: 7px;
+    font-size: 12px;
   }
   .settings-card {
     padding: 20px;
@@ -2603,13 +2662,6 @@ svg {
   .form-grid {
     grid-template-columns: 1fr;
   }
-  .fish-picker {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-  }
-  .fish-picker small {
-    font-size: 7px;
-  }
   .profile-hero {
     padding: 15px;
     gap: 12px;
@@ -2632,23 +2684,23 @@ svg {
   }
   .profile-task {
     gap: 9px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .profile-task .secondary {
-    font-size: 9px;
+    font-size: 12px;
     padding: 8px;
   }
   .assignment-picker {
     grid-template-columns: 1fr 1fr;
   }
   .toast {
-    font-size: 10px;
+    font-size: 12px;
     bottom: 16px;
     width: max-content;
     padding: 12px;
   }
   .tabs button {
-    font-size: 10px;
+    font-size: 12px;
     padding: 8px 13px;
   }
 }

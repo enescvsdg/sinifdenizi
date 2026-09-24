@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  // The Next.js, React Hooks and accessibility checks of eslint-config-next.
+  // ESLint itself cannot run here: typescript-eslint does not support TS 7.
+  "plugins": ["react", "nextjs", "jsx-a11y", "typescript", "unicorn", "oxc"],
+  "categories": { "correctness": "error" },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "error",
+    // Sprites are small prebuilt WebP files; a static export has no image optimiser.
+    "nextjs/no-img-element": "off",
+    // role="status" and role="group" are valid ARIA. The suggested <output>
+    // and <fieldset> do not fit a search message or a row of filter buttons.
+    "jsx-a11y/prefer-tag-over-role": "off"
+  },
+  "ignorePatterns": ["legacy/**"]
+}

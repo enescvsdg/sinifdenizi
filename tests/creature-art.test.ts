@@ -1,58 +1,65 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import {
   creatureArt,
   getCreatureArt,
   hasCreatureArt,
 } from "../lib/creature-art.ts";
 import { canChooseSpecies, speciesDefinitions } from "../lib/species.ts";
+import { decorNames } from "../lib/model.ts";
 
-test("registered creature viewports fit real shipped assets", () => {
-  for (const [id, art] of Object.entries(creatureArt)) {
-    assert.ok(art);
-    const { file, width, height } = art.image;
-    assert.ok(
-      file &&
-        !file.startsWith("/") &&
-        !file.includes("\\") &&
-        !file.split("/").includes(".."),
-    );
-    const bytes = readFileSync(
-      new URL(`../public/assets/${file}`, import.meta.url),
-    );
-    assert.ok(bytes.length > 0, `Species ${id} has an empty asset`);
-    assert.ok(
-      Number.isFinite(width) &&
-        Number.isFinite(height) &&
-        width > 0 &&
-        height > 0,
-    );
-    if (file.endsWith(".png")) {
-      assert.equal(bytes.subarray(1, 4).toString(), "PNG");
-      assert.equal(width, bytes.readUInt32BE(16), `${file} atlas width`);
-      assert.equal(height, bytes.readUInt32BE(20), `${file} atlas height`);
-    }
-    const [x, y, w, h] = art.viewBox;
-    assert.ok(art.viewBox.every(Number.isFinite));
-    assert.ok(
-      x >= 0 && y >= 0 && w > 0 && h > 0 && x + w <= width && y + h <= height,
-      `Species ${id} viewport leaves its atlas`,
-    );
-    if (art.clip?.kind === "polygon") {
-      const points = art.clip.points
-        .split(/\s+/)
-        .map((p) => p.split(",").map(Number));
-      assert.ok(points.length >= 3);
-      for (const [px, py] of points) {
-        assert.ok(Number.isFinite(px) && Number.isFinite(py));
-        assert.ok(
-          px >= x && px <= x + w && py >= y && py <= y + h,
-          `Species ${id} clip leaves its viewport`,
-        );
-      }
-    }
+const assets = new URL("../public/assets/", import.meta.url);
+
+/** Canvas size from a WebP header (lossy, lossless or extended). */
+function webpSize(bytes: Buffer) {
+  assert.equal(bytes.subarray(0, 4).toString(), "RIFF");
+  assert.equal(bytes.subarray(8, 12).toString(), "WEBP");
+  const chunk = bytes.subarray(12, 16).toString();
+  if (chunk === "VP8X")
+    return {
+      width: 1 + bytes.readUIntLE(24, 3),
+      height: 1 + bytes.readUIntLE(27, 3),
+    };
+  if (chunk === "VP8L") {
+    const bits = bytes.readUInt32LE(21);
+    return { width: 1 + (bits & 0x3fff), height: 1 + ((bits >> 14) & 0x3fff) };
   }
+  assert.equal(chunk, "VP8 ");
+  return {
+    width: bytes.readUInt16LE(26) & 0x3fff,
+    height: bytes.readUInt16LE(28) & 0x3fff,
+  };
+}
+
+function check(file: string, maxEdge: number, maxBytes: number) {
+  const bytes = readFileSync(new URL(file, assets));
+  const { width, height } = webpSize(bytes);
+  assert.ok(width > 0 && height > 0, `${file} has no size`);
+  assert.ok(
+    Math.max(width, height) <= maxEdge,
+    `${file} is ${width}×${height}`,
+  );
+  assert.ok(bytes.length <= maxBytes, `${file} is ${bytes.length} bytes`);
+}
+
+test("every registered creature has a small WebP sprite", () => {
+  for (const [id, file] of Object.entries(creatureArt)) {
+    assert.ok(file, `Species ${id} has no file`);
+    assert.ok(!file.startsWith("/") && !file.split("/").includes(".."));
+    check(file, 320, 60_000);
+  }
+});
+
+test("decorations and the background stay light", () => {
+  decorNames.forEach((_, i) => check(`decor/${i}.webp`, 418, 90_000));
+  check("aquarium.webp", 1672, 300_000);
+  // Masters live in assets-src/; nothing heavy is published.
+  const published = readdirSync(assets, { recursive: true }).map(String);
+  assert.deepEqual(
+    published.filter((name) => !name.endsWith(".webp") && name.includes(".")),
+    [],
+  );
 });
 
 test("the catalog and renderer share artwork availability without a fallback creature", () => {
