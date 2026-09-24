@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
 export default function Modal({
   title,
@@ -13,6 +13,7 @@ export default function Modal({
   wide?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
   useEffect(() => {
     const d = ref.current;
     d?.showModal();
@@ -31,11 +32,12 @@ export default function Modal({
         if (e.target === ref.current) onClose();
       }}
       className={`modal ${wide ? "wide" : ""}`}
+      aria-labelledby={titleId}
     >
       <header>
         <div>
           <span className="eyebrow">SINIFDENİZİ</span>
-          <h2>{title}</h2>
+          <h2 id={titleId}>{title}</h2>
         </div>
         <button className="icon-button" onClick={onClose} aria-label="Kapat">
           <X />

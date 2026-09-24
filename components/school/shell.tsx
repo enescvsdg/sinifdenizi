@@ -60,6 +60,16 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { activeTasks, openModal } = useSchool();
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => setMenuOpen(false), [pathname]);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setMenuOpen(false);
+      document.querySelector<HTMLElement>(".mobile-toggle")?.focus();
+    };
+    window.addEventListener("keydown", close);
+    return () => window.removeEventListener("keydown", close);
+  }, [menuOpen]);
   const [title, text] = headings[route] ?? [
     titles[route],
     "Birlikte öğrendiğimiz, birlikte büyüdüğümüz bir dünya.",
@@ -71,7 +81,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         aria-label="Menüyü kapat"
         onClick={() => setMenuOpen(false)}
       />
-      <aside className="sidebar">
+      <aside className="sidebar" id="app-menu" aria-label="Ana menü">
         <Brand />
         <div className="school-label">ÖĞRENME YOLCULUĞU</div>
         <nav>
@@ -142,6 +152,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             <button
               className="icon-button mobile-toggle"
               aria-label="Menüyü aç"
+              aria-controls="app-menu"
+              aria-expanded={menuOpen}
               onClick={() => setMenuOpen(!menuOpen)}
             >
               <Menu />

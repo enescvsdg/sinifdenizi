@@ -1,6 +1,81 @@
 const { chromium } = require("@playwright/test");
 const fs = require("node:fs");
 const path = require("node:path");
+// Visible text in the page that is smaller than 12 px or below WCAG AA
+// contrast (4.5:1, 3:1 for large text). Gradients count by their worst
+// colour stop; text over the aquarium painting has its own dark backing
+// and is checked by design, not here.
+function readabilityProblems() {
+  const parse = (c) => {
+    const m = c.match(/rgba?\(([^)]+)\)/);
+    if (!m) return null;
+    const v = m[1]
+      .split(/[ ,/]+/)
+      .filter(Boolean)
+      .map(Number);
+    return [v[0], v[1], v[2], v[3] ?? 1];
+  };
+  const over = (top, bottom) =>
+    [0, 1, 2].map((i) => top[i] * top[3] + bottom[i] * (1 - top[3])).concat(1);
+  const lum = (c) => {
+    const f = (x) =>
+      (x /= 255) <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+    return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+  };
+  const ratio = (a, b) => {
+    const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
+    return (x + 0.05) / (y + 0.05);
+  };
+  function backgrounds(el) {
+    const layers = [];
+    for (let n = el; n; n = n.parentElement) {
+      const cs = getComputedStyle(n);
+      if (cs.backgroundImage.includes("url(")) return null;
+      const stops = [...cs.backgroundImage.matchAll(/rgba?\([^)]+\)/g)].map(
+        (m) => parse(m[0]),
+      );
+      const color = parse(cs.backgroundColor);
+      layers.push({ stops, color });
+      if ((color && color[3] === 1) || stops.some((c) => c[3] === 1)) break;
+    }
+    let base = [[255, 255, 255, 1]];
+    for (const { stops, color } of layers.reverse()) {
+      if (color && color[3] > 0) base = base.map((b) => over(color, b));
+      if (stops.length)
+        base = stops.flatMap((c) => base.map((b) => over(c, b)));
+    }
+    return base;
+  }
+  const problems = [];
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let n; (n = walker.nextNode());) {
+    const text = n.textContent.trim();
+    const el = n.parentElement;
+    if (!text || !el.getBoundingClientRect().width) continue;
+    let opacity = 1,
+      shown = true;
+    for (let a = el; a; a = a.parentElement) {
+      const cs = getComputedStyle(a);
+      if (cs.display === "none" || cs.visibility === "hidden") shown = false;
+      opacity *= Number(cs.opacity);
+    }
+    if (!shown || !opacity) continue;
+    const cs = getComputedStyle(el),
+      size = parseFloat(cs.fontSize);
+    if (size > 0 && size < 12) problems.push(`${size}px: ${text.slice(0, 30)}`);
+    if (!size || el.closest(":disabled, .locked, .aquarium, .welcome-art"))
+      continue;
+    const fg = parse(cs.color),
+      bgs = backgrounds(el);
+    if (!fg || !bgs) continue;
+    fg[3] *= opacity;
+    const worst = Math.min(...bgs.map((b) => ratio(over(fg, b), b)));
+    const large = size >= 24 || (size >= 18.66 && Number(cs.fontWeight) >= 700);
+    if (worst < (large ? 3 : 4.5))
+      problems.push(`${worst.toFixed(2)}:1 ${cs.color}: ${text.slice(0, 30)}`);
+  }
+  return [...new Set(problems)];
+}
 (async () => {
   const channel = process.env.BROWSER_CHANNEL || "msedge";
   const screenshotDir = process.env.SCREENSHOT_DIR || "test-results";
@@ -31,6 +106,21 @@ const path = require("node:path");
       errors,
     }),
   );
+  for (const address of [
+    "",
+    "gorevler/",
+    "dekorasyonlar/",
+    "veli/",
+    "giris/",
+  ]) {
+    await page.goto(new URL(address, appUrl).href, {
+      waitUntil: "networkidle",
+    });
+    const problems = await page.evaluate(readabilityProblems);
+    if (problems.length)
+      throw Error(`Hard to read on /${address}:\n${problems.join("\n")}`);
+  }
+  await page.goto(appUrl, { waitUntil: "networkidle" });
   await page.getByRole("button", { name: "Yüzmeyi duraklat" }).click();
   await page.getByRole("button", { name: "Tam ekran", exact: true }).click();
   await page.waitForFunction(
@@ -61,7 +151,7 @@ const path = require("node:path");
     feedBefore,
   );
   await page.locator(".swimmer").first().click({ force: true });
-  await page.getByRole("dialog").waitFor();
+  await page.getByRole("dialog", { name: "Öğrencinin hikâyesi" }).waitFor();
   await page.getByRole("button", { name: "Kapat", exact: true }).click();
   await page.getByRole("button", { name: "Yeni görev", exact: true }).click();
   await page
@@ -78,7 +168,10 @@ const path = require("node:path");
   if ((await task.getByText("1/24 öğrenci tamamladı").count()) !== 1)
     throw Error("Approval missing");
   // An approval can be taken back, and the task edited and deleted.
-  await task.getByRole("button", { name: /onayı geri al$/ }).first().click();
+  await task
+    .getByRole("button", { name: /onayı geri al$/ })
+    .first()
+    .click();
   await task.getByText("0/24 öğrenci tamamladı").waitFor();
   await task.getByRole("button", { name: "Görevi onayla" }).first().click();
   await task.getByText("1/24 öğrenci tamamladı").waitFor();
@@ -102,16 +195,13 @@ const path = require("node:path");
   await task
     .getByRole("button", { name: "Evet, görevi sil", exact: true })
     .click();
-  await page.waitForFunction(
-    (before) => {
-      const s = JSON.parse(localStorage.getItem("sinifdenizi-v2"));
-      return (
-        !s.tasks.some((t) => t.title.startsWith("Test: deniz")) &&
-        s.students.reduce((n, x) => n + x.xp, 0) === before - 50
-      );
-    },
-    xpBeforeDelete,
-  );
+  await page.waitForFunction((before) => {
+    const s = JSON.parse(localStorage.getItem("sinifdenizi-v2"));
+    return (
+      !s.tasks.some((t) => t.title.startsWith("Test: deniz")) &&
+      s.students.reduce((n, x) => n + x.xp, 0) === before - 50
+    );
+  }, xpBeforeDelete);
   await page.getByRole("link", { name: "Öğrenciler", exact: true }).click();
   await page.waitForURL(/\/ogrenciler\/$/);
   await page.goBack();
@@ -158,7 +248,9 @@ const path = require("node:path");
   await page.getByRole("button", { name: "Kapat", exact: true }).click();
   await page.getByRole("textbox", { name: "Öğrenci ara" }).fill("Foto Deniz");
   await page.locator(".student-card").first().click();
-  await page.getByRole("button", { name: "Sınıftan çıkar", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Sınıftan çıkar", exact: true })
+    .click();
   await page
     .getByRole("button", { name: "Evet, sınıftan çıkar", exact: true })
     .click();
@@ -232,10 +324,14 @@ const path = require("node:path");
   await page.goto(new URL("ogrenciler/", appUrl).href, {
     waitUntil: "networkidle",
   });
-  await page.getByRole("textbox", { name: "Öğrenci ara" }).fill("Test Deniz Kaya");
+  await page
+    .getByRole("textbox", { name: "Öğrenci ara" })
+    .fill("Test Deniz Kaya");
   if ((await page.locator(".student-card").count()) !== 1)
     throw Error("Direct link did not show saved students");
-  await page.getByRole("link", { name: "Sınıf akvaryumu", exact: true }).click();
+  await page
+    .getByRole("link", { name: "Sınıf akvaryumu", exact: true })
+    .click();
   await page.waitForURL((url) => !url.pathname.includes("ogrenciler"));
   if ((await page.locator(".swimmer").count()) !== 25)
     throw Error("Student not persisted");
@@ -259,6 +355,22 @@ const path = require("node:path");
     await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)
   )
     throw Error("Mobile horizontal overflow");
+  const mobileProblems = await page.evaluate(readabilityProblems);
+  if (mobileProblems.length)
+    throw Error(`Hard to read on a phone:\n${mobileProblems.join("\n")}`);
+  await page.keyboard.press("Tab");
+  if (await page.evaluate(() => !!document.activeElement.closest(".sidebar")))
+    throw Error("Closed mobile menu takes keyboard focus");
+  const toggle = page.getByRole("button", { name: "Menüyü aç" });
+  await toggle.click();
+  if ((await toggle.getAttribute("aria-expanded")) !== "true")
+    throw Error("Menu button does not report the open menu");
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(
+    () => document.querySelector(".sidebar").getBoundingClientRect().right <= 0,
+  );
+  if ((await toggle.getAttribute("aria-expanded")) !== "false")
+    throw Error("Escape did not close the menu");
   await page.getByRole("button", { name: "Menüyü aç" }).click();
   await page
     .getByRole("link", { name: "Görevler", exact: false })
@@ -318,7 +430,7 @@ const path = require("node:path");
     throw Error("Reduced motion ignored");
   if (errors.length) throw Error(errors.join("\n"));
   console.log(
-    "PASS: aquarium selection, task creation/approval, student creation/search, photo shrinking, student edit/removal, save rollback, parent read-only, persistence, mobile navigation, no page errors",
+    "PASS: aquarium selection, task creation/approval, student creation/search, photo shrinking, student edit/removal, save rollback, parent read-only, persistence, mobile navigation, readable text, keyboard-safe menu, no page errors",
   );
   await browser.close();
 })().catch((e) => {
