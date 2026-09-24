@@ -29,7 +29,7 @@ npm start
 - 30 tür için özgün deniz canlısı çizimleri; üç derinlik katmanı, bağımsız hızlar, yakınlıkla kaçınma ve doğal kenar dönüşleri.
 - Aranabilir ve filtrelenebilir balık kataloğu; 27 temel tür ve öğrencinin kendi XP'siyle açılan üç özel tür: Altın balık 500 XP, Gökkuşağı 1.500 XP, Karanlık 3.000 XP.
 - Yeni örnek sınıfta 24 farklı temel tür; mevcut `sinifdenizi-v2` kayıtlarında öğrenci seçimi ve tür ID'leri korunur.
-- Yüzey ışığı, hareketli su yansımaları, mercan/yosun salınımı, küçük ortam sürüleri ve türe göre yüzme rotaları.
+- Yüzey ışığı, hareketli su yansımaları, mercan/yosun salınımı, küçük ortam sürüleri ve türe göre yüzme rotaları. Büyük türler (köpekbalıkları, vatoz, kaplumbağa…) daha büyük, küçük balıklar daha küçük çizilir. Animasyon her karede balık başına yalnızca bir `transform` yazar; 40 balıkta stil hesaplaması eskisinin altıda birine indi.
 - Duraklatma, azaltılmış hareket tercihi, tam ekran ve klavye ile öğrenci seçimi.
 - Okunabilirlik: tüm yazılar en az 12 px ve WCAG AA kontrastındadır (4,5:1); akvaryum üzerindeki yazıların koyu zemini vardır. Kapalı mobil menü klavye odağı almaz, Escape ile kapanır; pencerelerin ekran okuyucuda adı vardır.
 - Öğrenci ekleme, düzenleme ve sınıftan çıkarma; arama, profil ve balık değiştirme; 40 öğrenci sınırı. Yerel fotoğraflar (en fazla 10 MB) tarayıcıda 256 × 256 piksellik küçük bir kareye dönüştürülerek saklanır.

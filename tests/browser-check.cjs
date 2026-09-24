@@ -121,6 +121,14 @@ function readabilityProblems() {
       throw Error(`Hard to read on /${address}:\n${problems.join("\n")}`);
   }
   await page.goto(appUrl, { waitUntil: "networkidle" });
+  const swimPositions = () =>
+    page
+      .locator(".swimmer")
+      .evaluateAll((nodes) => nodes.map((n) => n.style.transform));
+  const start = await swimPositions();
+  await page.waitForTimeout(500);
+  if (JSON.stringify(start) === JSON.stringify(await swimPositions()))
+    throw Error("Fish do not swim");
   await page.getByRole("button", { name: "Yüzmeyi duraklat" }).click();
   await page.getByRole("button", { name: "Tam ekran", exact: true }).click();
   await page.waitForFunction(
@@ -421,11 +429,13 @@ function readabilityProblems() {
   await page.reload({ waitUntil: "networkidle" });
   const positions = await page
     .locator(".swimmer")
-    .evaluateAll((nodes) => nodes.map((n) => n.style.left + n.style.top));
+    .evaluateAll((nodes) => nodes.map((n) => n.style.transform));
   await page.waitForTimeout(300);
   const after = await page
     .locator(".swimmer")
-    .evaluateAll((nodes) => nodes.map((n) => n.style.left + n.style.top));
+    .evaluateAll((nodes) => nodes.map((n) => n.style.transform));
+  if (!positions.every(Boolean))
+    throw Error("Fish were not placed while motion is reduced");
   if (JSON.stringify(positions) !== JSON.stringify(after))
     throw Error("Reduced motion ignored");
   if (errors.length) throw Error(errors.join("\n"));

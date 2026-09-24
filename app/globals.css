@@ -641,18 +641,6 @@ svg {
 .aquarium-caption-separator {
   opacity: 0.4;
 }
-.water-rays {
-  position: absolute;
-  inset: 0;
-  background: repeating-conic-gradient(
-    from 161deg at 50% -20%,
-    transparent 0deg 11deg,
-    #a1efff0a 12deg 15deg,
-    transparent 16deg 25deg
-  );
-  pointer-events: none;
-  z-index: 3;
-}
 .fish-sprite,
 .decor-sprite {
   display: block;
@@ -672,25 +660,30 @@ svg {
 }
 .swimmer {
   position: absolute;
+  /* Moved by a transform written every frame (see components/aquarium.tsx). */
+  left: 0;
+  top: 0;
+  will-change: transform;
   aspect-ratio: 1;
   height: auto;
-  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  transform: translate(-50%, -50%);
   padding: 0;
   outline-offset: -2px;
   min-width: 48px;
   max-width: 120px;
   -webkit-tap-highlight-color: transparent;
 }
+/* Until the first frame places it, a fish would sit in the corner. */
+.swimmer:not([data-depth]) {
+  visibility: hidden;
+}
 .swimmer .fish-sprite {
   width: 100%;
   height: 100%;
   position: absolute;
   inset: 0;
-  transform: scaleX(var(--direction, 1)) rotate(var(--tilt, 0deg));
   filter: drop-shadow(0 7px 5px #063f5b55);
-  transition:
-    transform 0.55s ease,
-    filter 0.2s;
+  transition: filter 0.2s;
 }
 .swimmer:hover .fish-sprite,
 .swimmer:focus-visible .fish-sprite {
@@ -722,12 +715,9 @@ svg {
   border: 1px solid #dcffff55;
   box-shadow: inset 1px 1px 2px #ffffff77;
   border-radius: 100%;
-  animation: bubble-rise 12s linear infinite;
+  animation: ocean-bubble-rise 12s linear infinite;
   z-index: 3;
   pointer-events: none;
-}
-.paused {
-  animation-play-state: paused;
 }
 .food {
   position: absolute;
@@ -736,7 +726,7 @@ svg {
   background: #ffc15f;
   border-radius: 50%;
   top: 0;
-  animation: food-fall 2s ease-in forwards;
+  animation: ocean-food-fall 2s ease-in forwards;
   z-index: 12;
 }
 .aquarium-bottom {
@@ -947,51 +937,6 @@ svg {
   font-weight: 700;
   line-height: 1.65;
   color: #4f7388;
-}
-.collection-card {
-  margin-top: 24px;
-  padding: 22px;
-}
-.collection-card .eyebrow {
-  font-size: 12px;
-}
-.collection-card h2 {
-  font-size: 19px;
-}
-.fish-collection {
-  display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 15px;
-}
-.collection-fish {
-  padding: 7px 2px 13px;
-  border: 1px solid #edf3f8;
-  border-radius: 11px;
-  background: linear-gradient(#f5fbff, #fff);
-  transition: transform 0.2s;
-}
-.collection-fish:hover {
-  transform: translateY(-4px);
-  background: #edf9ff;
-}
-.collection-fish > .fish-sprite {
-  width: 86%;
-  height: auto;
-  aspect-ratio: 1;
-  margin: auto;
-}
-.collection-fish strong {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  margin-top: 4px;
-}
-.collection-fish small {
-  display: block;
-  color: #98a8b6;
-  font-size: 12px;
-  margin-top: 5px;
 }
 .page-footer {
   display: flex;
@@ -1781,34 +1726,6 @@ svg {
   border-top: 1px solid var(--line);
   padding-top: 20px;
 }
-.fish-picker {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 9px;
-  margin-top: 14px;
-}
-.fish-picker button {
-  border: 1px solid #edf2f7;
-  border-radius: 10px;
-  padding: 5px;
-  background: #f6fbff;
-}
-.fish-picker button.selected {
-  border-color: #1aa4f1;
-  background: #e8f6ff;
-  box-shadow: 0 0 0 1px #1aa4f1;
-}
-.fish-picker .fish-sprite {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1;
-}
-.fish-picker small {
-  font-size: 12px;
-  color: #6e90a9;
-  display: block;
-  min-height: 22px;
-}
 .form-error {
   color: #d6614c;
   font-size: 12px;
@@ -2059,25 +1976,6 @@ svg {
 .nav-scrim {
   display: none;
 }
-@keyframes bubble-rise {
-  from {
-    transform: translateY(0) translateX(0);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  to {
-    transform: translateY(-560px) translateX(25px);
-    opacity: 0;
-  }
-}
-@keyframes food-fall {
-  to {
-    transform: translateY(390px);
-    opacity: 0;
-  }
-}
 @media (min-width: 1600px) {
   .aquarium {
     height: 540px;
@@ -2109,9 +2007,6 @@ svg {
   }
   .goal-visual p {
     font-size: 12px;
-  }
-  .collection-fish > .fish-sprite {
-    max-width: 135px;
   }
   .quote-card {
     margin-top: auto;
@@ -2184,12 +2079,6 @@ svg {
   .ocean-title p {
     font-size: 12px;
   }
-  .fish-collection {
-    gap: 8px;
-  }
-  .collection-fish small {
-    font-size: 12px;
-  }
   .student-grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -2258,15 +2147,6 @@ svg {
   }
   .page-heading h1 {
     font-size: 27px;
-  }
-  .fish-collection {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  .collection-fish > .fish-sprite {
-    max-width: 100px;
-  }
-  .collection-fish small {
-    font-size: 12px;
   }
   .decor-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -2531,42 +2411,6 @@ svg {
     gap: 2px;
     margin-top: 12px;
   }
-  .collection-card {
-    padding: 16px;
-    margin-top: 18px;
-  }
-  .collection-card h2 {
-    font-size: 16px;
-  }
-  .collection-card .eyebrow {
-    font-size: 12px;
-  }
-  .collection-card .section-heading {
-    align-items: flex-end;
-  }
-  .collection-card .text-button {
-    font-size: 12px;
-    white-space: nowrap;
-    gap: 3px;
-  }
-  .collection-card .text-button svg {
-    width: 13px;
-  }
-  .fish-collection {
-    gap: 8px;
-    grid-template-columns: repeat(4, 1fr);
-  }
-  .collection-fish {
-    padding-bottom: 10px;
-  }
-  .collection-fish strong {
-    font-size: 12px;
-  }
-  .collection-fish small {
-    font-size: 12px;
-    line-height: 1.5;
-    min-height: 18px;
-  }
   .page-footer {
     font-size: 12px;
     gap: 4px;
@@ -2807,13 +2651,6 @@ svg {
   }
   .form-grid {
     grid-template-columns: 1fr;
-  }
-  .fish-picker {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-  }
-  .fish-picker small {
-    font-size: 12px;
   }
   .profile-hero {
     padding: 15px;

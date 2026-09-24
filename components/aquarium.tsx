@@ -31,7 +31,11 @@ export default function Aquarium({
   const nodes = useRef(new Map<string, HTMLButtonElement>());
   const swimmers = useRef<(Swimmer & { id: string })[]>([]);
   const elapsed = useRef(0);
-  const aspect = useRef(1.65);
+  const box = useRef({ width: 1000, height: 600 });
+  // Last transforms written per fish: unchanged values are not rewritten.
+  const written = useRef(new Map<string, [string, string]>());
+  const sprites = useRef(new Map<string, HTMLElement | null>());
+  const draw = useRef(() => {});
   const foodRemaining = useRef(0);
   const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -64,9 +68,11 @@ export default function Aquarium({
     document.addEventListener("visibilitychange", visibility);
     const size = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect;
-      aspect.current = width / Math.max(1, height);
+      box.current = { width, height };
       root.current?.style.setProperty("--ocean-width", `${width}px`);
       root.current?.style.setProperty("--ocean-height", `${height}px`);
+      // Positions are in pixels, so a paused aquarium needs a redraw too.
+      draw.current();
     });
     if (root.current) size.observe(root.current);
     return () => {
@@ -100,32 +106,53 @@ export default function Aquarium({
   useEffect(() => {
     let frame = 0;
     let last: number | null = null;
-    const draw = () =>
-      swimmers.current.forEach((f) => {
+    // One transform per fish and one per sprite each frame. Depth and size
+    // never change while swimming, so they are set once per element.
+    draw.current = () => {
+      const { width, height } = box.current;
+      for (const f of swimmers.current) {
         const el = nodes.current.get(f.id);
-        if (!el) return;
-        el.style.left = `${f.x * 100}%`;
-        el.style.top = `${f.y * 100}%`;
-        el.style.setProperty("--depth", String(4 + f.depth));
-        el.style.setProperty("--direction", String(f.facing));
-        el.style.setProperty("--scale", String(0.68 + f.depth * 0.15));
-        el.style.setProperty(
-          "--tilt",
-          `${Math.max(-8, Math.min(8, f.vy * 180))}deg`,
-        );
-      });
+        if (!el) continue;
+        const scale = (0.68 + f.depth * 0.15) * swimProfile(f.species).size;
+        if (el.dataset.depth !== String(f.depth)) {
+          el.dataset.depth = String(f.depth);
+          el.style.zIndex = String(4 + f.depth);
+        }
+        const move = `translate3d(${(f.x * width).toFixed(1)}px, ${(f.y * height).toFixed(1)}px, 0) translate(-50%, -50%) scale(${scale.toFixed(3)})`;
+        const tilt = Math.max(-8, Math.min(8, f.vy * 180));
+        const turn = `scaleX(${f.facing.toFixed(3)}) rotate(${tilt.toFixed(1)}deg)`;
+        const [lastMove, lastTurn] = written.current.get(f.id) ?? [];
+        if (move !== lastMove) el.style.transform = move;
+        if (turn !== lastTurn) {
+          let sprite = sprites.current.get(f.id);
+          if (!sprite?.isConnected) {
+            sprite = el.querySelector<HTMLElement>(".fish-sprite");
+            sprites.current.set(f.id, sprite);
+          }
+          if (sprite) sprite.style.transform = turn;
+        }
+        written.current.set(f.id, [move, turn]);
+      }
+    };
     const paint = (now: number) => {
       // No hidden-tab catch-up and no simulation reset when pausing/resuming.
       const dt = last === null ? 0 : Math.min((now - last) / 1000, 0.04);
       last = now;
       if (!document.hidden) {
         elapsed.current += dt;
-        stepSwimmers(swimmers.current, dt, elapsed.current, aspect.current);
-        draw();
+        const { width, height } = box.current;
+        stepSwimmers(
+          swimmers.current,
+          dt,
+          elapsed.current,
+          width / Math.max(1, height),
+        );
+        draw.current();
       }
       frame = requestAnimationFrame(paint);
     };
-    draw();
+    written.current.clear();
+    draw.current();
     if (!stopped) frame = requestAnimationFrame(paint);
     return () => cancelAnimationFrame(frame);
   }, [stopped, students]);

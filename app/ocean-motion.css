@@ -14,12 +14,12 @@
 .school-west .ocean-school-members { transform: scaleX(-1); }
 .ocean-school-fish { position: absolute; height: auto; aspect-ratio: 1.3; animation: ocean-small-fish 1.8s ease-in-out infinite alternate; }
 .ocean-mote { position: absolute; border-radius: 50%; background: #d6ffff; opacity: .25; animation: ocean-current-drift 18s ease-in-out infinite alternate; }
-.living-ocean .ocean-bubble { animation-name: ocean-bubble-rise; opacity: .4; }
+.living-ocean .ocean-bubble { opacity: .4; }
 .living-ocean .living-kelp { transform-origin: 50% 97%; animation: ocean-kelp-sway 7s ease-in-out infinite alternate; }
 .living-ocean .living-coral { transform-origin: 50% 95%; animation: ocean-coral-sway 9s ease-in-out infinite alternate; }
 .living-ocean .living-jelly { animation: ocean-jelly-float 6s ease-in-out infinite alternate; }
-.living-ocean .swimmer { z-index: var(--depth, 4); }
-.living-ocean .swimmer:hover, .living-ocean .swimmer:focus-visible { z-index: 16; }
+/* Hovered or focused fish rise above the depth order set inline. */
+.living-ocean .swimmer:hover, .living-ocean .swimmer:focus-visible { z-index: 16 !important; }
 .living-ocean .swimmer-body { position: absolute; inset: 0; display: block; animation: ocean-body-drift 4s ease-in-out infinite alternate; animation-delay: var(--swim-delay, 0s); }
 .living-ocean .swimmer .fish-sprite { transition: filter .2s; }
 .living-ocean .swim-dart { animation-duration: 1.8s; }
@@ -27,7 +27,7 @@
 .living-ocean .swim-hover { animation-duration: 3.6s; }
 .living-ocean .swim-pulse { animation-name: ocean-jelly-pulse; animation-duration: 2.2s; }
 .living-ocean .swim-bottom { animation-duration: 6s; }
-.living-ocean .food { animation-name: ocean-food-fall; pointer-events: none; }
+.living-ocean .food { pointer-events: none; }
 /* The single switch freezes CSS layers and JS trajectories at their current phases. */
 .living-ocean[data-motion="paused"] *, .living-ocean[data-motion="paused"] *::before, .living-ocean[data-motion="paused"] *::after { animation-play-state: paused !important; }
 @keyframes ocean-surface-roll { from { transform: translateX(-2%) scaleX(.97); opacity: .55; } to { transform: translateX(3%) scaleX(1.04); opacity: .88; } }
