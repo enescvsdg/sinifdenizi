@@ -92,6 +92,16 @@ function readabilityProblems() {
     "/",
   );
   await page.goto(appUrl, { waitUntil: "networkidle" });
+  // Link previews point at the share image under the site's base path.
+  const shareImage = await page.getAttribute(
+    'meta[property="og:image"]',
+    "content",
+  );
+  const sharePath = new URL(shareImage).pathname;
+  if (sharePath !== new URL(appUrl).pathname + "opengraph-image.jpg")
+    throw Error(`Share image address is wrong: ${shareImage}`);
+  if (!(await page.request.get(new URL(sharePath, appUrl).href)).ok())
+    throw Error("Share image is missing from the build");
   await page.screenshot({
     path: path.join(screenshotDir, "sinifdenizi-desktop.png"),
     fullPage: true,

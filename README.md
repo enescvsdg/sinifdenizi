@@ -38,7 +38,7 @@ Her pull request'te ve `main` dalına her gönderimde `.github/workflows/ci.yml`
 - Yüzey ışığı, hareketli su yansımaları, mercan/yosun salınımı, küçük ortam sürüleri ve türe göre yüzme rotaları. Büyük türler (köpekbalıkları, vatoz, kaplumbağa…) daha büyük, küçük balıklar daha küçük çizilir. Animasyon her karede balık başına yalnızca bir `transform` yazar; 40 balıkta stil hesaplaması eskisinin altıda birine indi.
 - Duraklatma, azaltılmış hareket tercihi, tam ekran ve klavye ile öğrenci seçimi.
 - Okunabilirlik: tüm yazılar en az 12 px ve WCAG AA kontrastındadır (4,5:1); akvaryum üzerindeki yazıların koyu zemini vardır. Kapalı mobil menü klavye odağı almaz, Escape ile kapanır; pencerelerin ekran okuyucuda adı vardır.
-- Marka kimliği: `design-reference/01-brand-guide.jpg` içindeki altı renk `app/globals.css` başında `--brand-*` değişkenleri olarak tanımlıdır; açık zemin üzerindeki yazılar için 4,5:1 kontrastı sağlayan koyu tonları (`--brand-*-text`) ayrıca vardır. Tarayıcı sekmesi, ana ekran ve uygulama olarak kurulum için palyaço balıklı ikonlar ve `manifest.webmanifest` bulunur; manifestteki adresler göreli olduğundan `/sinifdenizi/` gibi bir alt yolda da doğru çalışır.
+- Marka kimliği: `design-reference/01-brand-guide.jpg` içindeki altı renk `app/globals.css` başında `--brand-*` değişkenleri olarak tanımlıdır; açık zemin üzerindeki yazılar için 4,5:1 kontrastı sağlayan koyu tonları (`--brand-*-text`) ayrıca vardır. Tarayıcı sekmesi, ana ekran ve uygulama olarak kurulum için palyaço balıklı ikonlar ve `manifest.webmanifest` bulunur; manifestteki adresler göreli olduğundan `/sinifdenizi/` gibi bir alt yolda da doğru çalışır. Bağlantı WhatsApp, X, LinkedIn gibi yerlerde paylaşıldığında marka görseliyle bir önizleme çıkar.
 - Öğrenci ekleme, düzenleme ve sınıftan çıkarma; arama, profil ve balık değiştirme; 40 öğrenci sınırı. Yerel fotoğraflar (en fazla 10 MB) tarayıcıda 256 × 256 piksellik küçük bir kareye dönüştürülerek saklanır.
 - Tüm sınıfa veya seçilen öğrencilere görev atama, öğrenci bazında tek seferlik onay, XP ve yem ödülleri. Onay geri alınabilir (verilen ödül aynen geri çekilir); görevler düzenlenip silinebilir (silinen görevin ödülleri geri alınır). Onayların ve etkinliklerin zamanı kaydedilir; etkinlikler "5 dk önce", "Dün" gibi gösterilir, süresi geçen görevler işaretlenir.
 - Yem harcayarak besleme; öğrenci başına ortalama XP'ye göre dokuz dekorun açılması ve akvaryuma eklenmesi/kaldırılması. Ortalama sınıf büyüklüğüyle değişmediği için 15 ve 40 kişilik sınıflar aynı hızda ilerler; sınıf seviyesi akvaryumun açılan aşamasını gösterir. Her dekorun sahnede kendi sabit yeri vardır (`lib/decor-slots.ts`), birini kaldırmak diğerlerini oynatmaz.
@@ -69,6 +69,7 @@ Balıklar tek pozlu 2D sprite çizimleridir. Mevcut hareket, bütün gövdenin t
 - `assets-src/`: özgün PNG ana çizimler ve atlaslar (yayımlanmaz).
 - `public/assets/`: `npm run sprites` ile üretilen küçük WebP canlı, dekor ve arka plan dosyaları.
 - `app/icon.png`, `app/apple-icon.png`, `public/icons/`: yine `npm run sprites` ile üretilen uygulama ikonları; `app/manifest.ts` bunları kurulum bilgisine ekler.
+- `app/opengraph-image.jpg`: bağlantı paylaşıldığında görünen 1200 × 630 görsel (alternatif metni `opengraph-image.alt.txt`). `npm run share-image` (`scripts/build-share-image.cjs`) onu uygulamanın yazı tipleri ve çizimleriyle tarayıcıda çizer; varsayılan tarayıcı Microsoft Edge'dir, Playwright Chromium için `BROWSER_CHANNEL=chromium` kullanın.
 - `scripts/build-sprites.ts`: atlaslardaki tür kırpımları, WebP ve ikon üretimi.
 - `design-reference/`: altı ana referans; ilk yüklemeleri bozuk olduğu için bunlardan yeniden üretilen `brand-guide.jpg` ve `reference-board.jpg` (ayrıntı `ASSET_NOTES.md` içinde).
 - `docs/ORIGINAL_CREATURE_BRIEF.md`: özgün karakter tasarım hedefleri, atlas teslim durumu ve ileride hazırlanacak uzuv animasyonları.
@@ -81,3 +82,7 @@ Uygulama 4173 portunda çalışırken `npm run test:e2e` çalıştırın. Varsay
 Görsel üretim yöntemi ve promptlar `ASSET_NOTES.md` içindedir.
 
 Çekiçbaş köpekbalığı (ID 13), baş biçimini belirginleştirmek için ayrıca üretilen `assets-src/creature-hammerhead-original.png` dosyasından kesilir (1536 × 1024, RGBA). Üçüncü atlasın ilk çizimi dosyada korunur ancak bu türün görünümünde kullanılmaz.
+
+## Lisans
+
+Tüm hakları saklıdır (© 2026 SınıfDenizi ekibi). Kod, çizimler, marka ve belgeler izinsiz kopyalanamaz veya kullanılamaz; ayrıntılar `LICENSE` dosyasında. Bağımlılıklar kendi lisanslarına tabidir.
