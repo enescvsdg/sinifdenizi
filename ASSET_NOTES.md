@@ -31,6 +31,8 @@ Prompt: Create one production game decoration sprite atlas, genuine TRANSPARENT 
 05: geniş yüzme alanı, derinlik, tam ekran kullanım.
 06: güçlü akvaryum vitrini, öğretmen/veli ayrımı, mobil uyum.
 
-Eski `brand-guide.jpg` ve `reference-board.jpg` dosyaları görüntüleyicide açılamadı; dosyalar değiştirilmeden korundu. Kullanıcının sonradan sağladığı altı JPEG ana görsel kaynak olarak incelendi.
+Eski `brand-guide.jpg` ve `reference-board.jpg` dosyaları görüntüleyicide açılamadı: ilk yüklemeleri (commit `7730892`) yaklaşık 7,5 KB'ta kesilmişti, `brand-guide.jpg`'nin başlığında ayrıca bozulmuş baytlar vardı. Kullanıcının sonradan sağladığı altı JPEG ana görsel kaynak olarak incelendi.
+
+2026-09-24: İki dosya bu altı kaynaktan yeniden üretildi. `brand-guide.jpg`, bozuk başlıkta kayıtlı 900 × 822 boyutuyla `01-brand-guide.jpg`'nin küçültülmüş hâlidir (en-boy oranları aynıdır). `reference-board.jpg`, 01–06'yı etiketleriyle gösteren 1174 piksel genişliğinde bir özet panodur. Bozuk ilk hâller git geçmişinde durur.
 
 Çekiçbaş köpekbalığı (ID 13), baş biçimini belirginleştirmek için ayrıca üretilen `assets-src/creature-hammerhead-original.png` dosyasından kesilir (1536 × 1024, RGBA). Üçüncü atlasın ilk çizimi dosyada korunur ancak bu türün görünümünde kullanılmaz.

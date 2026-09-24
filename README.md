@@ -64,9 +64,9 @@ Balıklar tek pozlu 2D sprite çizimleridir. Mevcut hareket, bütün gövdenin t
 - `public/assets/`: `npm run sprites` ile üretilen küçük WebP canlı, dekor ve arka plan dosyaları.
 - `app/icon.png`, `app/apple-icon.png`, `public/icons/`: yine `npm run sprites` ile üretilen uygulama ikonları; `app/manifest.ts` bunları kurulum bilgisine ekler.
 - `scripts/build-sprites.ts`: atlaslardaki tür kırpımları, WebP ve ikon üretimi.
-- `design-reference/`: altı ana referans ve korunmuş eski iki dosya.
+- `design-reference/`: altı ana referans; ilk yüklemeleri bozuk olduğu için bunlardan yeniden üretilen `brand-guide.jpg` ve `reference-board.jpg` (ayrıntı `ASSET_NOTES.md` içinde).
 - `docs/ORIGINAL_CREATURE_BRIEF.md`: özgün karakter tasarım hedefleri, atlas teslim durumu ve ileride hazırlanacak uzuv animasyonları.
-- `tests/`: ödül bütünlüğü, veri doğrulama, kayıt ve yedekleme, 40 balık testi ve tarayıcı akışları.
+- `tests/`: ödül bütünlüğü, veri doğrulama, kayıt ve yedekleme, 40 balık testi, ikon ve tasarım referansı dosyalarının bütünlüğü ve tarayıcı akışları.
 
 ## Tarayıcı kontrolü
 

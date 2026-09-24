@@ -9,6 +9,8 @@ Codex yalnızca bu metne göre serbest tasarım üretmemeli. Repo içindeki gör
 - `design-reference/reference-board.jpg` — konuşma boyunca beğenilen marka, öğretmen/veli ekranları, balık çeşitliliği, sınıf başarısına bağlı dekorasyon ve geniş/tam ekran akvaryum tasarımlarının toplu referans panosu.
 - `design-reference/brand-guide.jpg` — logo, renk paleti, tipografi, uygulama ikonu ve marka dili için ana görsel referans.
 
+> Durum (2026-09-24): Bu iki dosyanın ilk yüklemeleri (commit `7730892`) yaklaşık 7,5 KB'ta kesilmişti ve açılmıyordu. `brand-guide.jpg`, bozuk dosyanın başlığında kayıtlı 900 × 822 boyutuyla `01-brand-guide.jpg`'den yeniden üretildi; `reference-board.jpg`, 01–06'yı etiketleriyle gösteren bir özet pano olarak yeniden oluşturuldu. İkisi de aşağıdaki altı dosyada olmayan bir bilgi içermez. Bozuk ilk hâlleri git geçmişinde durur.
+
 ### UI uygulamasından önce zorunlu inceleme
 
 Codex, herhangi bir UI uygulamasına veya yeniden tasarımına başlamadan önce aşağıdaki altı yüksek çözünürlüklü referans dosyasının tamamını açıp görsel olarak incelemelidir:
@@ -270,7 +272,7 @@ Alanlar:
 
 ## Teknik Yön
 
-İlk prototip şu anda tek bir `index.html` dosyası olarak GitHub Pages üzerinde çalışıyor. Bu sadece demo.
+İlk prototip tek bir `index.html` dosyasıydı; `legacy/index.html` içinde korunur. Güncel demo Next.js, React ve TypeScript ile statik olarak derlenir ve `main` dalına her gönderimde GitHub Pages'e yayımlanır. Veriler hâlâ tarayıcıda (`localStorage`) tutulur; Supabase ve gerçek giriş henüz bağlı değildir. Güncel durum `README.md` içindedir. Bu hâliyle de yalnızca demodur.
 
 Repo:
 https://github.com/enescvsdg/sinifdenizi
@@ -386,7 +388,7 @@ KVKK açısından veri minimizasyonu uygulanmalı.
 
 ## Mevcut Prototip Sorunları
 
-Mevcut `index.html` hızlı demo niteliğinde ve production değildir.
+İlk `index.html` prototipi hızlı demo niteliğindeydi ve production değildi.
 
 Başlıca eksikler:
 - tek dosya mimarisi
@@ -399,6 +401,8 @@ Başlıca eksikler:
 - mobile UX sınırlı
 - accessibility eksik
 - test yok
+
+Durum (2026-09-24): Next.js sürümünde tek dosya mimarisi yerine sayfa ve bileşenlere ayrılmış bir yapı, `assets-src/` → `npm run sprites` asset hattı, 30 türün özgün çizimleri, mobil düzen, kontrast/yazı boyu/klavye erişilebilirliği ile birim ve tarayıcı testleri var. localStorage, gerçek auth, gerçek veritabanı ve fotoğrafların tarayıcıda saklanması hâlâ açıktır.
 
 ## Codex'ten Beklenen İlk İş
 
