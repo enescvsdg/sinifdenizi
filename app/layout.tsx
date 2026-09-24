@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 export const metadata: Metadata = {
   title: {
@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   description:
     "Her sınıfın bir denizi var. Öğretmen ve veli için sınıfın gelişim yolculuğu.",
 };
+export const viewport: Viewport = { themeColor: "#0b6ef3" };
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {

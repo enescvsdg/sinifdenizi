@@ -1,5 +1,6 @@
-// Builds the small WebP files the app loads from the PNG masters in
-// assets-src/. Run after changing a master or a crop below: npm run sprites
+// Builds the small WebP files and the app icons the app loads from the PNG
+// masters in assets-src/. Run after changing a master or a crop below:
+// npm run sprites
 import { mkdir } from "node:fs/promises";
 import sharp from "sharp";
 
@@ -124,4 +125,44 @@ for (let i = 0; i < 9; i++) {
 await sharp(source("aquarium.png"))
   .webp({ quality: 80, effort: 6 })
   .toFile(output("aquarium.webp"));
-console.log("Sprites written to public/assets.");
+
+// App icons: the clownfish on the brand-guide blue tile. `rounded` icons
+// are shown as they are (browser tab); the others fill the square so that
+// iOS and Android can cut their own shape, keeping the fish in the middle.
+const clownfish = await cut(creatures[0]);
+async function icon(file: string, size: number, rounded: boolean) {
+  const radius = rounded ? size * 0.22 : 0;
+  const tile = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">
+    <defs><linearGradient id="sea" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#0b6ef3"/>
+    </linearGradient></defs>
+    <rect width="${size}" height="${size}" rx="${radius}" fill="url(#sea)"/>
+    <circle cx="${size * 0.78}" cy="${size * 0.22}" r="${size * 0.05}" fill="#fff" fill-opacity=".55"/>
+    <circle cx="${size * 0.86}" cy="${size * 0.36}" r="${size * 0.03}" fill="#fff" fill-opacity=".45"/>
+  </svg>`;
+  const fishWidth = Math.round(size * (rounded ? 0.8 : 0.62));
+  const fish = await sharp(clownfish)
+    .resize({ width: fishWidth })
+    .png()
+    .toBuffer();
+  const { height = 0 } = await sharp(fish).metadata();
+  await sharp(Buffer.from(tile))
+    .composite([
+      {
+        input: fish,
+        left: Math.round((size - fishWidth) / 2),
+        top: Math.round((size - height) / 2 + size * 0.03),
+      },
+    ])
+    .png({ compressionLevel: 9 })
+    .toFile(file);
+}
+const app = (file: string) =>
+  new URL(`../app/${file}`, import.meta.url).pathname;
+await mkdir(output("../icons"), { recursive: true });
+await icon(app("icon.png"), 64, true);
+await icon(app("apple-icon.png"), 180, false);
+await icon(output("../icons/icon-192.png"), 192, true);
+await icon(output("../icons/icon-512.png"), 512, true);
+await icon(output("../icons/icon-maskable-512.png"), 512, false);
+console.log("Sprites and icons written to public/ and app/.");

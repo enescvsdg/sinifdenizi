@@ -7,10 +7,20 @@
 @import "@fontsource/dm-sans/500.css";
 @import "@fontsource/dm-sans/600.css";
 :root {
+  /* Brand palette (design-reference/01-brand-guide.jpg). */
+  --brand-deep: #0b6ef3; /* Derin Mavi; white text on it is 4.6:1 */
+  --brand-sky: #38bdf8; /* Açık Mavi */
+  --brand-teal: #14b8a6; /* Turkuaz */
+  --brand-coral: #f97316; /* Mercan Turuncu */
+  --brand-sun: #facc15; /* Sıcak Sarı */
+  --brand-mist: #e0f2fe; /* Açık Zemin */
+  /* Darker shades of the same hues for text (at least 4.5:1 on white). */
+  --brand-deep-text: #0a5fc9;
+  --brand-teal-text: #0f766e;
+  --brand-coral-text: #c2410c;
+  --brand-sun-text: #a16207;
   --navy: #112f4e;
   --muted: #657589;
-  --blue: #087ff5;
-  --teal: #10ac9b;
   --line: #e8edf4;
   --bg: #f4f8fc;
   --font: "DM Sans", sans-serif;
@@ -46,7 +56,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 summary:focus-visible {
-  outline: 3px solid #42bde8;
+  outline: 3px solid var(--brand-deep);
   outline-offset: 4px;
 }
 a {
@@ -119,7 +129,7 @@ svg {
   white-space: nowrap;
 }
 .brand > div > span {
-  color: #0b91d1;
+  color: var(--brand-deep);
 }
 .brand small {
   font-size: 12px;
@@ -180,14 +190,14 @@ svg {
 }
 .sidebar nav a.active {
   background: #e9f4ff;
-  color: #076bd0;
+  color: var(--brand-deep-text);
   font-weight: 600;
 }
 .sidebar nav a.active:before {
   content: "";
   width: 3px;
   height: 22px;
-  background: #1186ff;
+  background: var(--brand-deep);
   position: absolute;
   left: -17px;
   border-radius: 0 3px 3px 0;
@@ -385,7 +395,7 @@ svg {
   margin-bottom: 7px;
 }
 .page-heading .eyebrow {
-  color: #207b86;
+  color: var(--brand-teal-text);
 }
 .page-heading p {
   font-size: 12px;
@@ -429,12 +439,12 @@ svg {
     transform 0.15s;
 }
 .primary {
-  background: #0b6ef3;
+  background: var(--brand-deep);
   color: white;
   box-shadow: 0 4px 10px #0b6ef325;
 }
 .primary:hover {
-  background: #0a5fc9;
+  background: var(--brand-deep-text);
 }
 .secondary {
   border: 1px solid #e1e9f2;
@@ -447,7 +457,7 @@ svg {
 .feed-button {
   background: #fff2e6;
   border: 1px solid #ffdfbc;
-  color: #9a6121;
+  color: var(--brand-coral-text);
 }
 .feed-button:hover {
   background: #ffe8cc;
@@ -839,7 +849,7 @@ svg {
   display: block;
   height: 100%;
   border-radius: 8px;
-  background: linear-gradient(90deg, #27bfb2, #45d2b9);
+  background: linear-gradient(90deg, var(--brand-teal), #2dd4bf);
   transition: width 0.4s;
 }
 .goal-numbers {
@@ -855,7 +865,7 @@ svg {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  color: #1f79b7;
+  color: var(--brand-deep-text);
   padding: 0;
 }
 .goal-card > .text-button {
@@ -1093,12 +1103,12 @@ svg {
 }
 .task-heading .eyebrow {
   font-size: 12px;
-  color: #1e8275;
+  color: var(--brand-teal-text);
 }
 .reward {
   background: #fff7e9;
   border: 1px solid #f5e7cc;
-  color: #8b6b31;
+  color: var(--brand-sun-text);
   padding: 10px 13px;
   border-radius: 9px;
   font-size: 12px;
@@ -1163,7 +1173,7 @@ svg {
 }
 .completed {
   font-size: 12px;
-  color: #168368;
+  color: var(--brand-teal-text);
   display: inline-flex;
   align-items: center;
   gap: 5px;

@@ -8,11 +8,13 @@ const types = {
   ".js": "application/javascript",
   ".css": "text/css",
   ".png": "image/png",
+  ".webp": "image/webp",
   ".jpg": "image/jpeg",
   ".svg": "image/svg+xml",
   ".woff2": "font/woff2",
   ".woff": "font/woff",
   ".json": "application/json",
+  ".webmanifest": "application/manifest+json",
   ".txt": "text/plain",
 };
 http
