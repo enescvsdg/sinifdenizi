@@ -99,6 +99,8 @@ export function StudentForm({
               defaultValue={student?.name}
               maxLength={70}
               required
+              // The dialog opens on this field rather than its close button.
+              // oxlint-disable-next-line jsx-a11y/no-autofocus
               autoFocus
             />
           </label>
@@ -169,7 +171,8 @@ export function TaskForm({
   const everyone = (ids: string[]) => students.every((s) => ids.includes(s.id));
   const [all, setAll] = useState(!task || everyone(task.assigned)),
     [ids, setIds] = useState<string[]>(task?.assigned ?? []),
-    [error, setError] = useState("");
+    [error, setError] = useState(""),
+    [nextWeek] = useState(() => localDay(new Date(Date.now() + 7 * 86400000)));
   const done = task?.done ?? [];
   return (
     <Modal
@@ -216,6 +219,8 @@ export function TaskForm({
             defaultValue={task?.title}
             maxLength={120}
             required
+            // The dialog opens on this field rather than its close button.
+            // oxlint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
           />
         </label>
@@ -244,9 +249,7 @@ export function TaskForm({
             <input
               name="due"
               type="date"
-              defaultValue={
-                task?.due ?? localDay(new Date(Date.now() + 7 * 86400000))
-              }
+              defaultValue={task?.due ?? nextWeek}
               required
             />
           </label>

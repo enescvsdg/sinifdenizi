@@ -7,6 +7,9 @@
     "build": "next build",
     "start": "node scripts/serve.cjs",
     "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
     "test:e2e": "node tests/browser-check.cjs",
     "sprites": "node --experimental-strip-types scripts/build-sprites.ts"
@@ -24,6 +27,7 @@
     "@types/node": "^26.6.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "oxlint": "^1.85.0",
     "prettier": "^3.9.8",
     "sharp": "^0.35.4",
     "typescript": "^7.0.2"

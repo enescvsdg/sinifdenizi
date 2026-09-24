@@ -25,6 +25,9 @@ export default function Modal({
     };
   }, []);
   return (
+    // A click on the backdrop closes the dialog; the keyboard has Escape
+    // (onCancel) and the close button.
+    // oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
     <dialog
       ref={ref}
       onCancel={onClose}

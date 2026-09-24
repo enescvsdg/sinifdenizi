@@ -36,13 +36,15 @@ export default function Aquarium({
   const written = useRef(new Map<string, [string, string]>());
   const sprites = useRef(new Map<string, HTMLElement | null>());
   const draw = useRef(() => {});
-  const foodRemaining = useRef(0);
+  // What is left of the latest meal, in milliseconds of running time.
+  const meal = useRef({ feeding: 0, left: 0 });
   const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [full, setFull] = useState(false);
   const [hover, setHover] = useState<string | null>(null);
-  const [food, setFood] = useState(false);
+  const [eaten, setEaten] = useState(0);
+  const food = feeding > eaten;
   const stopped = paused || reducedMotion || hidden;
 
   useEffect(() => {
@@ -83,22 +85,16 @@ export default function Aquarium({
   }, []);
 
   useEffect(() => {
-    if (!feeding) return;
-    foodRemaining.current = 2600;
-    setFood(true);
-  }, [feeding]);
-  useEffect(() => {
     if (!food || stopped) return;
+    if (meal.current.feeding !== feeding)
+      meal.current = { feeding, left: 2600 };
     const started = performance.now();
-    const timer = window.setTimeout(
-      () => setFood(false),
-      foodRemaining.current,
-    );
+    const timer = window.setTimeout(() => setEaten(feeding), meal.current.left);
     return () => {
       clearTimeout(timer);
-      foodRemaining.current = Math.max(
+      meal.current.left = Math.max(
         0,
-        foodRemaining.current - (performance.now() - started),
+        meal.current.left - (performance.now() - started),
       );
     };
   }, [food, feeding, stopped]);

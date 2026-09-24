@@ -84,10 +84,13 @@ export function SchoolProvider({ children }: { children: ReactNode }) {
   function notify(text: string, tone: Toast["tone"] = "success") {
     setToast({ text, tone });
   }
+  // The saved class exists only in this browser, so it replaces the
+  // prerendered sample class after hydration.
   useEffect(() => {
     const result = loadState(browserStorage());
     if (result.status === "loaded") {
       saved.current = result.state;
+      // oxlint-disable-next-line react/set-state-in-effect
       setState(result.state);
     } else if (result.status === "backedUp") {
       notify(
@@ -132,7 +135,11 @@ export function SchoolProvider({ children }: { children: ReactNode }) {
     }
   }, [state, ready]);
   // A profile belongs to the page it was opened on.
-  useEffect(() => setSelected(null), [pathname]);
+  const [selectedOn, setSelectedOn] = useState(pathname);
+  if (selectedOn !== pathname) {
+    setSelectedOn(pathname);
+    setSelected(null);
+  }
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(

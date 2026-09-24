@@ -59,7 +59,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   const parent = route === "parent";
   const { activeTasks, openModal } = useSchool();
   const [menuOpen, setMenuOpen] = useState(false);
-  useEffect(() => setMenuOpen(false), [pathname]);
+  // Navigating closes the menu.
+  const [menuPath, setMenuPath] = useState(pathname);
+  if (menuPath !== pathname) {
+    setMenuPath(pathname);
+    setMenuOpen(false);
+  }
   useEffect(() => {
     if (!menuOpen) return;
     const close = (e: KeyboardEvent) => {
