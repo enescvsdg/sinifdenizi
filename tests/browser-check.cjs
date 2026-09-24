@@ -229,9 +229,29 @@ function readabilityProblems() {
   // A 2.4 MB photo is stored as a small square, so storage does not fill up.
   await page.getByRole("button", { name: "Öğrenci ekle", exact: true }).click();
   await page.getByLabel("Ad soyad", { exact: true }).fill("Foto Deniz");
+  const photoInput = page.getByLabel("Profil fotoğrafı (isteğe bağlı)");
+  const bigPhoto = path.join(__dirname, "../assets-src/aquarium.png");
+  // An unusable file chosen while a photo is still loading must not leave
+  // the dialog's save button disabled.
+  await photoInput.setInputFiles(bigPhoto);
+  await photoInput.setInputFiles({
+    name: "notlar.txt",
+    mimeType: "text/plain",
+    buffer: Buffer.from("not a photo"),
+  });
   await page
-    .getByLabel("Profil fotoğrafı (isteğe bağlı)")
-    .setInputFiles(path.join(__dirname, "../assets-src/aquarium.png"));
+    .getByText("En fazla 10 MB boyutunda JPG, PNG veya WebP seçin.")
+    .waitFor();
+  await page
+    .waitForFunction(
+      () => !document.querySelector("dialog form button.primary").disabled,
+      null,
+      { timeout: 5000 },
+    )
+    .catch(() => {
+      throw Error("Save button stayed disabled after an unusable file");
+    });
+  await photoInput.setInputFiles(bigPhoto);
   await page.getByAltText("Seçilen profil fotoğrafı").waitFor();
   await page
     .getByRole("button", { name: "Öğrenciyi ekle", exact: true })

@@ -15,6 +15,7 @@ import {
   undoApproval,
   updateTask,
   removeTask,
+  payout,
 } from "../lib/model.ts";
 import { createSwimmers, stepSwimmers } from "../lib/swimming.ts";
 test("approval rewards the assigned student exactly once", () => {
@@ -205,6 +206,29 @@ test("editing a task keeps students who finished it", () => {
   assert.ok(next.tasks[0].assigned.includes(s.students[23].id));
   assert.deepEqual(next.tasks[0].done, t.done);
   assert.equal(updateTask(s, t.id, { ...t, title: " " }), s);
+});
+test("editing rewards keeps what completions from older saves were paid", () => {
+  const s = initialState(),
+    t = s.tasks[1],
+    id = t.done[0],
+    waiting = s.students.find((x) => !t.done.includes(x.id))!.id;
+  // Saves from before payouts were recorded have no approvals.
+  const legacy = {
+    ...s,
+    tasks: s.tasks.map((x) =>
+      x.id === t.id ? { ...x, approvals: undefined } : x,
+    ),
+  };
+  const edited = updateTask(legacy, t.id, { ...t, xp: t.xp + 100, feed: 9 });
+  const task = edited.tasks[1];
+  assert.deepEqual(payout(task, id), { xp: t.xp, feed: t.feed });
+  assert.deepEqual(payout(task, waiting), { xp: t.xp + 100, feed: 9 });
+  const xp = (state: typeof s) => state.students.find((x) => x.id === id)!.xp;
+  assert.equal(xp(undoApproval(edited, t.id, id)), xp(s) - t.xp);
+  assert.equal(
+    classXp(s) - classXp(removeTask(edited, t.id)),
+    t.xp * t.done.length,
+  );
 });
 test("deleting a task takes back what its approvals paid", () => {
   const s = initialState(),

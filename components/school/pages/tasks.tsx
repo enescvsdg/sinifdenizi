@@ -140,7 +140,8 @@ export function TasksPage() {
                                 <span className="completed">
                                   <CheckCheck size={16} />
                                   Tamamlandı
-                                  {approval && ` · ${formatDay(approval.at)}`}
+                                  {approval?.at &&
+                                    ` · ${formatDay(approval.at)}`}
                                 </span>
                                 <button
                                   className="undo-button"

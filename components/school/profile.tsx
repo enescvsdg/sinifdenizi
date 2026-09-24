@@ -10,6 +10,7 @@ import {
   assignStudentFish,
   earnedBadges,
   level,
+  payout,
   removeStudent,
   species,
   type Student,
@@ -106,46 +107,50 @@ export function StudentProfile({
       <h3>Görev geçmişi</h3>
       {state.tasks
         .filter((t) => t.assigned.includes(student.id))
-        .map((t) => (
-          <div key={t.id} className="profile-task">
-            <div>
-              <strong>{t.title}</strong>
-              <small>
-                +{t.xp} XP · +{t.feed} yem
-              </small>
-            </div>
-            {t.done.includes(student.id) ? (
-              <span className="profile-task-status">
-                <span className="completed">
-                  <Check size={15} />
-                  Tamamlandı
-                  {t.approvals?.[student.id] &&
-                    ` · ${formatDay(t.approvals[student.id].at)}`}
+        .map((t) => {
+          // A completed task shows what it paid, even if its rewards changed.
+          const { xp, feed } = payout(t, student.id),
+            approvedAt = t.approvals?.[student.id]?.at;
+          return (
+            <div key={t.id} className="profile-task">
+              <div>
+                <strong>{t.title}</strong>
+                <small>
+                  +{xp} XP · +{feed} yem
+                </small>
+              </div>
+              {t.done.includes(student.id) ? (
+                <span className="profile-task-status">
+                  <span className="completed">
+                    <Check size={15} />
+                    Tamamlandı
+                    {approvedAt && ` · ${formatDay(approvedAt)}`}
+                  </span>
+                  {role === "teacher" && (
+                    <button
+                      className="undo-button"
+                      aria-label={`“${t.title}” onayını geri al`}
+                      title="Onayı geri al"
+                      onClick={() => undo(t.id, student.id)}
+                    >
+                      <Undo2 size={15} />
+                      Geri al
+                    </button>
+                  )}
                 </span>
-                {role === "teacher" && (
-                  <button
-                    className="undo-button"
-                    aria-label={`“${t.title}” onayını geri al`}
-                    title="Onayı geri al"
-                    onClick={() => undo(t.id, student.id)}
-                  >
-                    <Undo2 size={15} />
-                    Geri al
-                  </button>
-                )}
-              </span>
-            ) : role === "teacher" ? (
-              <button
-                className="secondary"
-                onClick={() => approve(t.id, student.id)}
-              >
-                Onayla
-              </button>
-            ) : (
-              <span className="pending">Devam ediyor</span>
-            )}
-          </div>
-        ))}
+              ) : role === "teacher" ? (
+                <button
+                  className="secondary"
+                  onClick={() => approve(t.id, student.id)}
+                >
+                  Onayla
+                </button>
+              ) : (
+                <span className="pending">Devam ediyor</span>
+              )}
+            </div>
+          );
+        })}
       {role === "teacher" && (
         <>
           <h3>Deniz arkadaşını seç</h3>

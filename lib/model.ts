@@ -47,12 +47,13 @@ export type Task = {
   /**
    * When each student's completion was approved and what it paid, so an
    * approval can be undone exactly. Approvals saved before this was
-   * recorded have no entry.
+   * recorded have no entry until the task's rewards change.
    */
   approvals?: Record<string, Approval>;
   createdAt?: string;
 };
-export type Approval = { at: string; xp: number; feed: number };
+/** `at` is missing for completions saved before approvals had dates. */
+export type Approval = { at?: string; xp: number; feed: number };
 export type Activity = {
   id: string;
   text: string;
@@ -461,6 +462,16 @@ export function removeStudent(s: SchoolState, studentId: string): SchoolState {
   };
 }
 
+/**
+ * What a student's completion of a task paid, or would pay if approved
+ * now. Completions saved before payouts were recorded were paid the task's
+ * rewards, which could not be edited then.
+ */
+export function payout(t: Task, studentId: string) {
+  const paid = t.done.includes(studentId) ? t.approvals?.[studentId] : null;
+  return paid ?? { xp: t.xp, feed: t.feed };
+}
+
 /** Takes back an approval and exactly what it paid (never below zero). */
 export function undoApproval(
   s: SchoolState,
@@ -469,7 +480,7 @@ export function undoApproval(
 ): SchoolState {
   const t = s.tasks.find((x) => x.id === taskId);
   if (!t || !t.done.includes(studentId)) return s;
-  const paid = t.approvals?.[studentId] ?? { xp: t.xp, feed: t.feed };
+  const paid = payout(t, studentId);
   const { [studentId]: _undone, ...approvals } = t.approvals ?? {};
   return {
     ...s,
@@ -510,11 +521,13 @@ export function updateTask(
   if (!t || !title) return s;
   const { description, type, due, xp, feed } = changes;
   const assigned = [...new Set([...changes.assigned, ...t.done])];
+  // Record what every completion was paid before the rewards change.
+  const approvals = Object.fromEntries(t.done.map((id) => [id, payout(t, id)]));
   return {
     ...s,
     tasks: s.tasks.map((x) =>
       x.id === taskId
-        ? { ...x, title, description, type, due, xp, feed, assigned }
+        ? { ...x, title, description, type, due, xp, feed, assigned, approvals }
         : x,
     ),
   };

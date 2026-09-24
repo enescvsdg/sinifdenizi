@@ -34,6 +34,8 @@ export function StudentForm({
     if (f.size > maxPhotoBytes || !photoTypes.includes(f.type)) {
       input.value = "";
       setError("En fazla 10 MB boyutunda JPG, PNG veya WebP seçin.");
+      // Any earlier photo still loading is dropped, so stop waiting for it.
+      setLoading(false);
       return;
     }
     setLoading(true);
