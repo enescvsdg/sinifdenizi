@@ -39,12 +39,22 @@ export type Task = {
   feed: number;
   assigned: string[];
   done: string[];
+  /**
+   * When each student's completion was approved and what it paid, so an
+   * approval can be undone exactly. Approvals saved before this was
+   * recorded have no entry.
+   */
+  approvals?: Record<string, Approval>;
+  createdAt?: string;
 };
+export type Approval = { at: string; xp: number; feed: number };
 export type Activity = {
   id: string;
   text: string;
   kind: "task" | "student" | "feed";
-  time: string;
+  /** ISO timestamp; older saves only have the `time` text. */
+  at?: string;
+  time?: string;
   /** The student the text names, so it goes when the student is removed. */
   studentId?: string;
 };
@@ -200,6 +210,23 @@ export function initialState(): SchoolState {
       done: everyone(),
     },
   ];
+  // Sample approvals: current tasks this week, earlier ones on their due day.
+  const approvedOn: Record<string, string> = {
+    "task-1": "2026-09-21",
+    "task-2": "2026-09-22",
+    "task-3": "2026-09-23",
+  };
+  for (const task of tasks)
+    task.approvals = Object.fromEntries(
+      task.done.map((id) => [
+        id,
+        {
+          at: `${approvedOn[task.id] ?? task.due}T15:00:00`,
+          xp: task.xp,
+          feed: task.feed,
+        },
+      ]),
+    );
   const students = names.map((name, i) => ({
     id: ids[i],
     name,
@@ -221,20 +248,20 @@ export function initialState(): SchoolState {
         id: "a1",
         text: "Zeynep okuma görevini tamamladı.",
         kind: "task" as const,
-        time: "Az önce",
+        at: "2026-09-23T10:40:00",
         studentId: "student-1",
       },
       {
         id: "a2",
         text: "Sınıfımız batık geminin kilidini açtı.",
         kind: "student" as const,
-        time: "Bugün",
+        at: "2026-09-22T15:00:00",
       },
       {
         id: "a3",
         text: "Ali balığını besledi.",
         kind: "feed" as const,
-        time: "Bugün",
+        at: "2026-09-22T12:00:00",
         studentId: "student-0",
       },
     ],
@@ -244,6 +271,7 @@ export function approveTask(
   s: SchoolState,
   taskId: string,
   studentId: string,
+  now = new Date(),
 ): SchoolState {
   const t = s.tasks.find((x) => x.id === taskId),
     st = s.students.find((x) => x.id === studentId);
@@ -266,31 +294,40 @@ export function approveTask(
         : x,
     ),
     tasks: s.tasks.map((x) =>
-      x.id === taskId ? { ...x, done: [...x.done, studentId] } : x,
+      x.id === taskId
+        ? {
+            ...x,
+            done: [...x.done, studentId],
+            approvals: {
+              ...x.approvals,
+              [studentId]: { at: now.toISOString(), xp: x.xp, feed: x.feed },
+            },
+          }
+        : x,
     ),
     activities: [
       {
         id: `${taskId}-${studentId}`,
         text: `${st.name.split(" ")[0]}, “${t.title}” görevini tamamladı.`,
         kind: "task" as const,
-        time: "Az önce",
+        at: now.toISOString(),
         studentId,
       },
       ...s.activities,
     ].slice(0, 20),
   };
 }
-export function feedStudents(s: SchoolState): SchoolState {
+export function feedStudents(s: SchoolState, now = new Date()): SchoolState {
   if (!s.students.some((x) => x.feed > 0)) return s;
   return {
     ...s,
     students: s.students.map((x) => ({ ...x, feed: Math.max(0, x.feed - 1) })),
     activities: [
       {
-        id: `feed-${Date.now()}`,
+        id: `feed-${now.getTime()}`,
         text: "Yemi olan balıklar beslendi. Afiyet olsun!",
         kind: "feed" as const,
-        time: "Az önce",
+        at: now.toISOString(),
       },
       ...s.activities,
     ].slice(0, 20),
@@ -327,7 +364,9 @@ export function validState(value: unknown): value is SchoolState {
         Number.isFinite(t.feed) &&
         t.feed >= 0 &&
         Array.isArray(t.assigned) &&
-        Array.isArray(t.done),
+        Array.isArray(t.done) &&
+        (t.approvals === undefined ||
+          (typeof t.approvals === "object" && t.approvals !== null)),
     ) &&
     Array.isArray(s.decorations) &&
     s.decorations.every((x) => Number.isInteger(x) && x >= 0 && x < 9) &&
@@ -382,4 +421,73 @@ export function removeStudent(s: SchoolState, studentId: string): SchoolState {
       })),
     activities: s.activities.filter((entry) => entry.studentId !== studentId),
   };
+}
+
+/** Takes back an approval and exactly what it paid (never below zero). */
+export function undoApproval(
+  s: SchoolState,
+  taskId: string,
+  studentId: string,
+): SchoolState {
+  const t = s.tasks.find((x) => x.id === taskId);
+  if (!t || !t.done.includes(studentId)) return s;
+  const paid = t.approvals?.[studentId] ?? { xp: t.xp, feed: t.feed };
+  const { [studentId]: _undone, ...approvals } = t.approvals ?? {};
+  return {
+    ...s,
+    students: s.students.map((x) =>
+      x.id === studentId
+        ? {
+            ...x,
+            xp: Math.max(0, x.xp - paid.xp),
+            feed: Math.max(0, x.feed - paid.feed),
+          }
+        : x,
+    ),
+    tasks: s.tasks.map((x) =>
+      x.id === taskId
+        ? { ...x, done: x.done.filter((id) => id !== studentId), approvals }
+        : x,
+    ),
+    activities: s.activities.filter(
+      (a) => a.id !== `${taskId}-${studentId}`,
+    ),
+  };
+}
+
+export type TaskChanges = Pick<
+  Task,
+  "title" | "description" | "type" | "due" | "xp" | "feed" | "assigned"
+>;
+
+/**
+ * Edits a task. Students who already completed it stay assigned, and new
+ * rewards apply to later approvals only.
+ */
+export function updateTask(
+  s: SchoolState,
+  taskId: string,
+  changes: TaskChanges,
+): SchoolState {
+  const t = s.tasks.find((x) => x.id === taskId),
+    title = changes.title.trim();
+  if (!t || !title) return s;
+  const { description, type, due, xp, feed } = changes;
+  const assigned = [...new Set([...changes.assigned, ...t.done])];
+  return {
+    ...s,
+    tasks: s.tasks.map((x) =>
+      x.id === taskId
+        ? { ...x, title, description, type, due, xp, feed, assigned }
+        : x,
+    ),
+  };
+}
+
+/** Deletes a task and takes back what its approvals paid. */
+export function removeTask(s: SchoolState, taskId: string): SchoolState {
+  const t = s.tasks.find((x) => x.id === taskId);
+  if (!t) return s;
+  const undone = t.done.reduce((state, id) => undoApproval(state, taskId, id), s);
+  return { ...undone, tasks: undone.tasks.filter((x) => x.id !== taskId) };
 }

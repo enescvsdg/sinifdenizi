@@ -5,6 +5,7 @@ import { FishPicker } from "./fish-catalog";
 import { canChooseSpecies } from "@/lib/species";
 import { createId } from "@/lib/ids";
 import { maxPhotoBytes, photoTypes, shrinkPhoto } from "@/lib/photo";
+import { localDay } from "@/lib/time";
 import { type Student, type Task } from "@/lib/model";
 export function StudentForm({
   onClose,
@@ -51,7 +52,9 @@ export function StudentForm({
   }
   return (
     <Modal
-      title={student ? "Öğrenci bilgilerini düzenle" : "Yeni bir deniz arkadaşı"}
+      title={
+        student ? "Öğrenci bilgilerini düzenle" : "Yeni bir deniz arkadaşı"
+      }
       onClose={onClose}
       wide
     >
@@ -72,7 +75,9 @@ export function StudentForm({
             return;
           }
           if (!canChooseSpecies(fish, 0)) {
-            setError("Başlangıç için hazır ve kilidi açık bir deniz arkadaşı seçin.");
+            setError(
+              "Başlangıç için hazır ve kilidi açık bir deniz arkadaşı seçin.",
+            );
             return;
           }
           onSave({
@@ -153,16 +158,25 @@ export function TaskForm({
   students,
   onClose,
   onSave,
+  task,
 }: {
   students: Student[];
   onClose: () => void;
   onSave: (t: Task) => void;
+  /** Edit this task instead of creating a new one. */
+  task?: Task;
 }) {
-  const [all, setAll] = useState(true),
-    [ids, setIds] = useState<string[]>([]),
+  const everyone = (ids: string[]) => students.every((s) => ids.includes(s.id));
+  const [all, setAll] = useState(!task || everyone(task.assigned)),
+    [ids, setIds] = useState<string[]>(task?.assigned ?? []),
     [error, setError] = useState("");
+  const done = task?.done ?? [];
   return (
-    <Modal title="Yeni bir öğrenme fırsatı" onClose={onClose} wide>
+    <Modal
+      title={task ? "Görevi düzenle" : "Yeni bir öğrenme fırsatı"}
+      onClose={onClose}
+      wide
+    >
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -173,8 +187,7 @@ export function TaskForm({
             setError("Görev başlığını yazın ve en az bir öğrenci seçin.");
             return;
           }
-          onSave({
-            id: createId(),
+          const fields = {
             title,
             description: String(data.get("description")).trim(),
             type: String(data.get("type")),
@@ -182,8 +195,17 @@ export function TaskForm({
             xp: Number(data.get("xp")),
             feed: Number(data.get("feed")),
             assigned,
-            done: [],
-          });
+          };
+          onSave(
+            task
+              ? { ...task, ...fields }
+              : {
+                  id: createId(),
+                  ...fields,
+                  done: [],
+                  createdAt: new Date().toISOString(),
+                },
+          );
         }}
       >
         <label>
@@ -191,6 +213,7 @@ export function TaskForm({
           <input
             name="title"
             placeholder="Bugün ne keşfediyoruz?"
+            defaultValue={task?.title}
             maxLength={120}
             required
             autoFocus
@@ -201,13 +224,14 @@ export function TaskForm({
           <textarea
             name="description"
             placeholder="Öğrencileriniz için kısa bir yol tarifi…"
+            defaultValue={task?.description}
             maxLength={800}
           />
         </label>
         <div className="form-grid">
           <label>
             Görev türü
-            <select name="type">
+            <select name="type" defaultValue={task?.type}>
               {["Ödev", "Okuma", "Davranış", "Katılım", "Proje", "Diğer"].map(
                 (t) => (
                   <option key={t}>{t}</option>
@@ -220,9 +244,9 @@ export function TaskForm({
             <input
               name="due"
               type="date"
-              defaultValue={new Date(Date.now() + 7 * 86400000)
-                .toISOString()
-                .slice(0, 10)}
+              defaultValue={
+                task?.due ?? localDay(new Date(Date.now() + 7 * 86400000))
+              }
               required
             />
           </label>
@@ -234,7 +258,7 @@ export function TaskForm({
               min="1"
               max="1000"
               step="1"
-              defaultValue="50"
+              defaultValue={task?.xp ?? 50}
               required
             />
           </label>
@@ -246,11 +270,17 @@ export function TaskForm({
               min="0"
               max="100"
               step="1"
-              defaultValue="10"
+              defaultValue={task?.feed ?? 10}
               required
             />
           </label>
         </div>
+        {task && done.length > 0 && (
+          <p className="form-note">
+            Ödül değişikliği yalnızca bundan sonraki onaylara uygulanır. Görevi
+            tamamlayan öğrenciler görevden çıkarılamaz.
+          </p>
+        )}
         <label className="checkbox-label">
           <input
             type="checkbox"
@@ -265,7 +295,8 @@ export function TaskForm({
               <label key={s.id}>
                 <input
                   type="checkbox"
-                  checked={ids.includes(s.id)}
+                  checked={ids.includes(s.id) || done.includes(s.id)}
+                  disabled={done.includes(s.id)}
                   onChange={(e) =>
                     setIds(
                       e.target.checked
@@ -288,7 +319,9 @@ export function TaskForm({
           <button type="button" className="secondary" onClick={onClose}>
             Vazgeç
           </button>
-          <button className="primary">Görevi oluştur</button>
+          <button className="primary">
+            {task ? "Değişiklikleri kaydet" : "Görevi oluştur"}
+          </button>
         </div>
       </form>
     </Modal>

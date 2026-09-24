@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Award, Check, Pencil, Trash2 } from "lucide-react";
+import { Award, Check, Pencil, Trash2, Undo2 } from "lucide-react";
 import Modal from "../modal";
 import { FishPicker } from "../fish-catalog";
 import { Fish } from "../sprites";
@@ -14,6 +14,7 @@ import {
   species,
   type Student,
 } from "@/lib/model";
+import { formatDay } from "@/lib/time";
 
 export function StudentProfile({
   student,
@@ -26,7 +27,7 @@ export function StudentProfile({
   onClose: () => void;
   onEdit: () => void;
 }) {
-  const { state, setState, notify, tasksDone, approve } = useSchool();
+  const { state, setState, notify, tasksDone, approve, undo } = useSchool();
   const [removing, setRemoving] = useState(false);
   const done = tasksDone(student.id);
   function removeFromClass() {
@@ -114,9 +115,24 @@ export function StudentProfile({
               </small>
             </div>
             {t.done.includes(student.id) ? (
-              <span className="completed">
-                <Check size={15} />
-                Tamamlandı
+              <span className="profile-task-status">
+                <span className="completed">
+                  <Check size={15} />
+                  Tamamlandı
+                  {t.approvals?.[student.id] &&
+                    ` · ${formatDay(t.approvals[student.id].at)}`}
+                </span>
+                {role === "teacher" && (
+                  <button
+                    className="undo-button"
+                    aria-label={`“${t.title}” onayını geri al`}
+                    title="Onayı geri al"
+                    onClick={() => undo(t.id, student.id)}
+                  >
+                    <Undo2 size={15} />
+                    Geri al
+                  </button>
+                )}
               </span>
             ) : role === "teacher" ? (
               <button

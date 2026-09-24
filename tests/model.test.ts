@@ -11,6 +11,9 @@ import {
   earnedBadges,
   removeStudent,
   updateStudent,
+  undoApproval,
+  updateTask,
+  removeTask,
 } from "../lib/model.ts";
 import { createSwimmers, stepSwimmers } from "../lib/swimming.ts";
 test("approval rewards the assigned student exactly once", () => {
@@ -33,10 +36,18 @@ test("the sample classroom agrees with its own task records", () => {
   for (const student of s.students) {
     const done = s.tasks.filter((t) => t.done.includes(student.id));
     assert.equal(counts.get(student.id) ?? 0, done.length);
-    assert.equal(student.xp, done.reduce((sum, t) => sum + t.xp, 0));
+    assert.equal(
+      student.xp,
+      done.reduce((sum, t) => sum + t.xp, 0),
+    );
   }
-  assert.ok(s.tasks.every((t) => t.done.every((id) => t.assigned.includes(id))));
-  assert.deepEqual(earnedBadges(4).map((b) => b.name), ["İlk adım"]);
+  assert.ok(
+    s.tasks.every((t) => t.done.every((id) => t.assigned.includes(id))),
+  );
+  assert.deepEqual(
+    earnedBadges(4).map((b) => b.name),
+    ["İlk adım"],
+  );
   assert.equal(earnedBadges(5).length, 2);
   assert.equal(earnedBadges(0).length, 0);
 });
@@ -52,7 +63,10 @@ test("removing a student clears their records and tasks given only to them", () 
   assert.ok(
     next.tasks.every((t) => !t.assigned.includes(id) && !t.done.includes(id)),
   );
-  assert.equal(completedCounts(next).get(other), completedCounts(before).get(other));
+  assert.equal(
+    completedCounts(next).get(other),
+    completedCounts(before).get(other),
+  );
   assert.ok(next.activities.every((a) => a.studentId !== id));
   assert.ok(next.activities.some((a) => a.studentId === other));
   assert.equal(removeStudent(next, id), next);
@@ -109,7 +123,10 @@ test("local state validates malformed and unsupported saves", () => {
   assert.equal(validState(legacy), true);
 });
 test("40 swimmers remain finite and inside the aquarium through long pauses", () => {
-  const fish = createSwimmers(40, Array.from({ length: 40 }, (_, i) => i % 30));
+  const fish = createSwimmers(
+    40,
+    Array.from({ length: 40 }, (_, i) => i % 30),
+  );
   for (let i = 0; i < 10000; i++)
     stepSwimmers(fish, i === 500 ? 100 : 1 / 60, i / 60);
   for (const f of fish) {
@@ -117,4 +134,60 @@ test("40 swimmers remain finite and inside the aquarium through long pauses", ()
     assert.ok(f.x >= 0.025 && f.x <= 0.975);
     assert.ok(f.y >= 0.05 && f.y <= 0.85);
   }
+});
+
+test("an approval records when it happened and can be undone exactly", () => {
+  const s = initialState(),
+    student = s.students[23],
+    t = s.tasks[0],
+    now = new Date("2026-09-24T09:30:00Z");
+  const approved = approveTask(s, t.id, student.id, now);
+  assert.deepEqual(approved.tasks[0].approvals?.[student.id], {
+    at: now.toISOString(),
+    xp: t.xp,
+    feed: t.feed,
+  });
+  assert.equal(approved.activities[0].at, now.toISOString());
+  // Rewards changed later: undo takes back what was actually paid.
+  const edited = updateTask(approved, t.id, { ...approved.tasks[0], xp: 999 });
+  const undone = undoApproval(edited, t.id, student.id);
+  assert.equal(undone.students[23].xp, student.xp);
+  assert.equal(undone.students[23].feed, student.feed);
+  assert.ok(!undone.tasks[0].done.includes(student.id));
+  assert.equal(undone.tasks[0].approvals?.[student.id], undefined);
+  assert.ok(!undone.activities.some((a) => a.id === `${t.id}-${student.id}`));
+  assert.equal(undoApproval(undone, t.id, student.id), undone);
+});
+test("undo never takes a student below zero after the feed was spent", () => {
+  const s = initialState(),
+    id = s.students[0].id,
+    t = s.tasks[0];
+  const spent = {
+    ...s,
+    students: s.students.map((x) => (x.id === id ? { ...x, feed: 2 } : x)),
+  };
+  assert.equal(undoApproval(spent, t.id, id).students[0].feed, 0);
+});
+test("editing a task keeps students who finished it", () => {
+  const s = initialState(),
+    t = s.tasks[0],
+    finished = t.done[0];
+  const next = updateTask(s, t.id, {
+    ...t,
+    title: "  Yeni başlık ",
+    assigned: [s.students[23].id],
+  });
+  assert.equal(next.tasks[0].title, "Yeni başlık");
+  assert.ok(next.tasks[0].assigned.includes(finished));
+  assert.ok(next.tasks[0].assigned.includes(s.students[23].id));
+  assert.deepEqual(next.tasks[0].done, t.done);
+  assert.equal(updateTask(s, t.id, { ...t, title: " " }), s);
+});
+test("deleting a task takes back what its approvals paid", () => {
+  const s = initialState(),
+    t = s.tasks[1];
+  const next = removeTask(s, t.id);
+  assert.ok(!next.tasks.some((x) => x.id === t.id));
+  assert.equal(classXp(s) - classXp(next), t.xp * t.done.length);
+  assert.equal(validState(next), true);
 });

@@ -18,6 +18,9 @@ import { StudentProfile } from "./profile";
 import {
   initialState,
   approveTask,
+  undoApproval,
+  updateTask,
+  removeTask,
   feedStudents,
   classXp,
   participation,
@@ -43,6 +46,9 @@ type School = {
   /** Increases on every feeding so the aquarium can drop food. */
   feeding: number;
   approve: (taskId: string, studentId: string) => void;
+  undo: (taskId: string, studentId: string) => void;
+  editTask: (taskId: string) => void;
+  deleteTask: (taskId: string) => void;
   feedAll: () => void;
   toggleDecor: (index: number) => void;
   openProfile: (studentId: string) => void;
@@ -65,6 +71,7 @@ export function SchoolProvider({ children }: { children: ReactNode }) {
     [ready, setReady] = useState(false),
     [modal, setModal] = useState<ModalKind | "edit-student" | null>(null),
     [selected, setSelected] = useState<string | null>(null),
+    [editing, setEditing] = useState<string | null>(null),
     [toast, setToast] = useState<Toast | null>(null),
     [feeding, setFeeding] = useState(0);
   // `saved` mirrors what is in storage; `persist` is off when saving would
@@ -135,7 +142,8 @@ export function SchoolProvider({ children }: { children: ReactNode }) {
   const xp = classXp(state),
     feed = state.students.reduce((n, x) => n + x.feed, 0),
     completed = completedCounts(state);
-  const current = state.students.find((x) => x.id === selected);
+  const current = state.students.find((x) => x.id === selected),
+    editingTask = state.tasks.find((x) => x.id === editing);
   const school: School = {
     state,
     setState,
@@ -150,6 +158,15 @@ export function SchoolProvider({ children }: { children: ReactNode }) {
     approve(taskId, studentId) {
       setState((s) => approveTask(s, taskId, studentId));
       notify("Görev onaylandı. XP ve yem öğrencinin hesabına eklendi.");
+    },
+    undo(taskId, studentId) {
+      setState((s) => undoApproval(s, taskId, studentId));
+      notify("Onay geri alındı. Verilen XP ve yem geri çekildi.");
+    },
+    editTask: setEditing,
+    deleteTask(taskId) {
+      setState((s) => removeTask(s, taskId));
+      notify("Görev silindi.");
     },
     feedAll() {
       if (feed === 0) {
@@ -200,7 +217,7 @@ export function SchoolProvider({ children }: { children: ReactNode }) {
                   id: `new-${s.id}`,
                   text: `${s.name}, sınıf denizimize katıldı.`,
                   kind: "student" as const,
-                  time: "Az önce",
+                  at: new Date().toISOString(),
                   studentId: s.id,
                 },
                 ...old.activities,
@@ -220,6 +237,18 @@ export function SchoolProvider({ children }: { children: ReactNode }) {
             setModal(null);
             router.push(paths.tasks);
             notify("Yeni görev öğrencilere atandı.");
+          }}
+        />
+      )}
+      {editingTask && (
+        <TaskForm
+          task={editingTask}
+          students={state.students}
+          onClose={() => setEditing(null)}
+          onSave={(task) => {
+            setState((old) => updateTask(old, task.id, task));
+            setEditing(null);
+            notify("Görev güncellendi.");
           }}
         />
       )}

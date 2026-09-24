@@ -77,6 +77,41 @@ const path = require("node:path");
   await task.getByRole("button", { name: "Görevi onayla" }).first().click();
   if ((await task.getByText("1/24 öğrenci tamamladı").count()) !== 1)
     throw Error("Approval missing");
+  // An approval can be taken back, and the task edited and deleted.
+  await task.getByRole("button", { name: /onayı geri al$/ }).first().click();
+  await task.getByText("0/24 öğrenci tamamladı").waitFor();
+  await task.getByRole("button", { name: "Görevi onayla" }).first().click();
+  await task.getByText("1/24 öğrenci tamamladı").waitFor();
+  await task.getByRole("button", { name: "Düzenle", exact: true }).click();
+  await page
+    .getByLabel("Görev başlığı", { exact: true })
+    .fill("Test: deniz araştırması (güncel)");
+  await page
+    .getByRole("button", { name: "Değişiklikleri kaydet", exact: true })
+    .click();
+  await page
+    .locator(".task-card h3", { hasText: "Test: deniz araştırması (güncel)" })
+    .waitFor();
+  const xpBeforeDelete = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem("sinifdenizi-v2")).students.reduce(
+      (n, s) => n + s.xp,
+      0,
+    ),
+  );
+  await task.getByRole("button", { name: "Sil", exact: true }).click();
+  await task
+    .getByRole("button", { name: "Evet, görevi sil", exact: true })
+    .click();
+  await page.waitForFunction(
+    (before) => {
+      const s = JSON.parse(localStorage.getItem("sinifdenizi-v2"));
+      return (
+        !s.tasks.some((t) => t.title.startsWith("Test: deniz")) &&
+        s.students.reduce((n, x) => n + x.xp, 0) === before - 50
+      );
+    },
+    xpBeforeDelete,
+  );
   await page.getByRole("link", { name: "Öğrenciler", exact: true }).click();
   await page.waitForURL(/\/ogrenciler\/$/);
   await page.goBack();

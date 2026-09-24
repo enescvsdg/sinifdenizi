@@ -13,6 +13,7 @@ import {
 import { Decor } from "../sprites";
 import { Metric, Progress } from "./ui";
 import { useSchool } from "./state";
+import { TimeAgo } from "./time";
 import { decorNames, decorThresholds } from "@/lib/model";
 import { paths } from "@/lib/routes";
 
@@ -70,7 +71,7 @@ export function Activities() {
             </span>
             <div>
               <p>{a.text}</p>
-              <small>{a.time}</small>
+              <small>{a.at ? <TimeAgo at={a.at} /> : a.time}</small>
             </div>
           </div>
         ))}

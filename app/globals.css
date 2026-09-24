@@ -1909,6 +1909,48 @@ svg {
   margin-top: 5px;
   color: #93a3b5;
 }
+.task-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: -4px 0 4px;
+}
+.undo-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #33617f;
+  white-space: nowrap;
+}
+.undo-button:hover {
+  background: #eef5fb;
+}
+.profile-task-status {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.overdue {
+  margin-left: 6px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: #fff1ee;
+  color: #a8351f;
+  font-size: 12px;
+  font-weight: 600;
+}
+.form-note {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #5d7488;
+  margin-top: 4px;
+}
 .profile-actions {
   display: flex;
   flex-wrap: wrap;
