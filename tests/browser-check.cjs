@@ -12,9 +12,11 @@ const path = require("node:path");
   });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto(process.env.APP_URL || "http://127.0.0.1:4173", {
-    waitUntil: "networkidle",
-  });
+  const appUrl = (process.env.APP_URL || "http://127.0.0.1:4173").replace(
+    /\/?$/,
+    "/",
+  );
+  await page.goto(appUrl, { waitUntil: "networkidle" });
   await page.screenshot({
     path: path.join(screenshotDir, "sinifdenizi-desktop.png"),
     fullPage: true,
@@ -75,7 +77,14 @@ const path = require("node:path");
   await task.getByRole("button", { name: "Görevi onayla" }).first().click();
   if ((await task.getByText("1/24 öğrenci tamamladı").count()) !== 1)
     throw Error("Approval missing");
-  await page.getByRole("button", { name: "Öğrenciler", exact: true }).click();
+  await page.getByRole("link", { name: "Öğrenciler", exact: true }).click();
+  await page.waitForURL(/\/ogrenciler\/$/);
+  await page.goBack();
+  await page.waitForURL(/\/gorevler\/$/);
+  if ((await page.locator(".task-card").count()) < 1)
+    throw Error("Back button did not return to tasks");
+  await page.getByRole("link", { name: "Öğrenciler", exact: true }).click();
+  await page.waitForURL(/\/ogrenciler\/$/);
   await page.getByRole("button", { name: "Öğrenci ekle", exact: true }).click();
   await page.getByLabel("Ad soyad", { exact: true }).fill("Test Deniz");
   await page
@@ -148,7 +157,7 @@ const path = require("node:path");
   if ((await page.locator(".student-card").count()) !== 0)
     throw Error("Unsaved student kept on screen");
   await page.evaluate(() => localStorage.removeItem("e2e-filler"));
-  await page.getByRole("button", { name: "Veli görünümü" }).click();
+  await page.getByRole("link", { name: "Veli görünümü" }).click();
   await page.getByLabel("Çocuk seç").selectOption("student-1");
   if ((await page.getByLabel("Çocuk seç").inputValue()) !== "student-1")
     throw Error("Child selection failed");
@@ -159,10 +168,10 @@ const path = require("node:path");
   if (await page.getByRole("button", { name: "Onayla", exact: true }).count())
     throw Error("Parent approval leaked");
   await page
-    .getByRole("button", { name: "Öğretmen görünümü", exact: true })
+    .getByRole("link", { name: "Öğretmen görünümü", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Dekorasyonlar", exact: true })
+    .getByRole("link", { name: "Dekorasyonlar", exact: true })
     .first()
     .click();
   await page.screenshot({
@@ -185,7 +194,14 @@ const path = require("node:path");
       .isDisabled())
   )
     throw Error("Locked decoration enabled");
-  await page.reload({ waitUntil: "networkidle" });
+  await page.goto(new URL("ogrenciler/", appUrl).href, {
+    waitUntil: "networkidle",
+  });
+  await page.getByRole("textbox", { name: "Öğrenci ara" }).fill("Test Deniz Kaya");
+  if ((await page.locator(".student-card").count()) !== 1)
+    throw Error("Direct link did not show saved students");
+  await page.getByRole("link", { name: "Sınıf akvaryumu", exact: true }).click();
+  await page.waitForURL((url) => !url.pathname.includes("ogrenciler"));
   if ((await page.locator(".swimmer").count()) !== 25)
     throw Error("Student not persisted");
   if (
@@ -210,9 +226,17 @@ const path = require("node:path");
     throw Error("Mobile horizontal overflow");
   await page.getByRole("button", { name: "Menüyü aç" }).click();
   await page
-    .getByRole("button", { name: "Görevler", exact: false })
+    .getByRole("link", { name: "Görevler", exact: false })
     .first()
     .click();
+  await page.waitForURL(/\/gorevler\/$/);
+  await page.locator(".task-card").first().waitFor();
+  // The menu slides closed once the new page is shown.
+  await page.waitForFunction(
+    () => document.querySelector(".sidebar").getBoundingClientRect().right <= 0,
+    null,
+    { timeout: 3000 },
+  );
   const sampleTasks = await page.evaluate(
     () => JSON.parse(localStorage.getItem("sinifdenizi-v2")).tasks.length,
   );
@@ -220,7 +244,7 @@ const path = require("node:path");
     throw Error("Mobile navigation failed");
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page
-    .getByRole("button", { name: "Sınıf akvaryumu", exact: true })
+    .getByRole("link", { name: "Sınıf akvaryumu", exact: true })
     .click();
   await page.screenshot({
     path: path.join(screenshotDir, "sinifdenizi-smartboard.png"),

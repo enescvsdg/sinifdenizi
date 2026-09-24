@@ -24,7 +24,8 @@ npm start
 
 ## Bu aşamada çalışanlar
 
-- Akvaryum merkezli öğretmen arayüzü; mobil ve akıllı tahta düzeni.
+- Akvaryum merkezli öğretmen arayüzü; mobil ve akıllı tahta düzeni. Her sayfanın paylaşılabilir bir adresi vardır; tarayıcının geri tuşu ve sayfa yenileme beklendiği gibi çalışır.
+- Hızlı işlemler ve onay bekleyen görevlerle ayrı bir öğretmen ana sayfası.
 - 30 tür için özgün deniz canlısı çizimleri; üç derinlik katmanı, bağımsız hızlar, yakınlıkla kaçınma ve doğal kenar dönüşleri.
 - Aranabilir ve filtrelenebilir balık kataloğu; 27 temel tür ve öğrencinin kendi XP'siyle açılan üç özel tür: Altın balık 500 XP, Gökkuşağı 1.500 XP, Karanlık 3.000 XP.
 - Yeni örnek sınıfta 24 farklı temel tür; mevcut `sinifdenizi-v2` kayıtlarında öğrenci seçimi ve tür ID'leri korunur.
@@ -46,8 +47,10 @@ Balıklar tek pozlu 2D sprite çizimleridir. Mevcut hareket, bütün gövdenin t
 
 ## Yapı
 
-- `app/`: sayfa ve duyarlı tasarım sistemi.
-- `components/`: ekranlar, formlar, diyalog ve akvaryum.
+- `app/`: rotalar ve duyarlı tasarım sistemi. Her sayfanın kendi adresi vardır: `/` akvaryum, `/ana-sayfa/`, `/ogrenciler/`, `/gorevler/`, `/dekorasyonlar/`, `/rozetler/`, `/raporlar/`, `/ayarlar/`, `/veli/` ve `/giris/`. Sınıf sayfaları `app/(sinif)/layout.tsx` içindeki ortak kabuğu ve durumu paylaşır.
+- `components/school/`: sınıf durumu ve kayıt (`state.tsx`), kenar çubuğu ile üst çubuk (`shell.tsx`), öğrenci profili ve her sayfanın bileşeni (`pages/`).
+- `components/`: formlar, diyalog, balık kataloğu ve akvaryum.
+- `lib/routes.ts`: sayfa adresleri ve başlıkları.
 - `lib/model.ts`: tipler, ödüller ve ilerleme hesapları.
 - `lib/species.ts`: 30 sabit tür ID'si, katalog filtreleri ve öğrenci XP kilitleri.
 - `lib/creature-art.ts`: çizimi hazır türler ve WebP dosyaları.

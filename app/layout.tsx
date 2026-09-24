@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 export const metadata: Metadata = {
-  title: "SınıfDenizi · Öğren. Kazan. Büyüt.",
+  title: {
+    default: "SınıfDenizi · Öğren. Kazan. Büyüt.",
+    template: "%s · SınıfDenizi",
+  },
   description:
     "Her sınıfın bir denizi var. Öğretmen ve veli için sınıfın gelişim yolculuğu.",
 };

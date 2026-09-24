@@ -51,6 +51,7 @@ summary:focus-visible {
 }
 a {
   color: inherit;
+  text-decoration: none;
 }
 h1,
 h2,
@@ -160,7 +161,7 @@ svg {
   flex-direction: column;
   gap: 6px;
 }
-.sidebar nav button {
+.sidebar nav a {
   height: 45px;
   display: flex;
   align-items: center;
@@ -173,15 +174,15 @@ svg {
   font-weight: 500;
   position: relative;
 }
-.sidebar nav button:hover {
+.sidebar nav a:hover {
   background: #f5f9fc;
 }
-.sidebar nav button.active {
+.sidebar nav a.active {
   background: #e9f4ff;
   color: #087cf0;
   font-weight: 600;
 }
-.sidebar nav button.active:before {
+.sidebar nav a.active:before {
   content: "";
   width: 3px;
   height: 22px;
@@ -247,7 +248,7 @@ svg {
 .sidebar-bottom {
   margin-top: auto;
 }
-.sidebar-bottom > button {
+.sidebar-bottom > a {
   display: flex;
   align-items: center;
   gap: 13px;
@@ -1335,6 +1336,70 @@ svg {
 .report-card {
   padding: 25px;
 }
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 264px;
+  gap: 20px;
+}
+.dashboard-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.quick-actions,
+.pending-tasks {
+  padding: 22px;
+}
+.quick-actions h2,
+.pending-tasks h2 {
+  font-size: 18px;
+}
+.quick-actions > div {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.quick-actions > div > * {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  transition:
+    transform 0.15s,
+    border-color 0.15s;
+}
+.quick-actions > div > *:hover {
+  transform: translateY(-2px);
+  border-color: #9ed7fd;
+}
+.pending-tasks > div:not(.section-heading) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 160px;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #f1f5fa;
+}
+.pending-tasks > div:last-child {
+  border-bottom: 0;
+}
+.pending-tasks strong {
+  display: block;
+  font-size: 13px;
+}
+.pending-tasks span {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #5d7488;
+}
 .bar-chart {
   display: flex;
   align-items: flex-end;
@@ -1629,7 +1694,7 @@ svg {
   line-height: 1.8;
   margin-bottom: 30px;
 }
-.welcome-form > button {
+.welcome-form > a {
   width: 100%;
   justify-content: space-between;
   margin-bottom: 12px;
@@ -2008,12 +2073,12 @@ svg {
   .brand-mark {
     width: 35px;
   }
-  .sidebar nav button {
+  .sidebar nav a {
     font-size: 11px;
     padding-left: 11px;
     gap: 9px;
   }
-  .sidebar nav button.active:before {
+  .sidebar nav a.active:before {
     left: -12px;
   }
   .page-content {
@@ -2086,8 +2151,12 @@ svg {
   }
 }
 @media (max-width: 1000px) {
-  .ocean-layout {
+  .ocean-layout,
+  .dashboard-layout {
     grid-template-columns: 1fr;
+  }
+  .quick-actions > div {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .ocean-aside {
     display: grid;
@@ -2580,6 +2649,10 @@ svg {
   }
   .report-card {
     padding: 20px;
+  }
+  .pending-tasks > div:not(.section-heading) {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
   .report-card h2 {
     font-size: 18px;
