@@ -81,3 +81,7 @@ Uygulama 4173 portunda çalışırken `npm run test:e2e` çalıştırın. Varsay
 Görsel üretim yöntemi ve promptlar `ASSET_NOTES.md` içindedir.
 
 Çekiçbaş köpekbalığı (ID 13), baş biçimini belirginleştirmek için ayrıca üretilen `assets-src/creature-hammerhead-original.png` dosyasından kesilir (1536 × 1024, RGBA). Üçüncü atlasın ilk çizimi dosyada korunur ancak bu türün görünümünde kullanılmaz.
+
+## Lisans
+
+Tüm hakları saklıdır (© 2026 SınıfDenizi ekibi). Kod, çizimler, marka ve belgeler izinsiz kopyalanamaz veya kullanılamaz; ayrıntılar `LICENSE` dosyasında. Bağımlılıklar kendi lisanslarına tabidir.
