@@ -8,11 +8,11 @@ Bu belge, `lib/species.ts` içindeki 30 sabit tür kimliğinin özgün karakter 
 
 | Dosya | Atlas grubu | Tür ID'leri | Gerçek boyut |
 | --- | --- | --- | --- |
-| `public/assets/creatures-original-01.png` | A | 0–5 | 1.536 × 1.024 px |
-| `public/assets/creatures-original-02.png` | B | 6–11 | 1.536 × 1.024 px |
-| `public/assets/creatures-original-03.png` | C | 12–17 | 1.536 × 1.024 px |
-| `public/assets/creatures-original-04.png` | D | 18–23 | 1.536 × 1.024 px |
-| `public/assets/creatures-original-05.png` | E | 24–29 | 1.536 × 1.024 px |
+| `assets-src/creatures-original-01.png` | A | 0–5 | 1.536 × 1.024 px |
+| `assets-src/creatures-original-02.png` | B | 6–11 | 1.536 × 1.024 px |
+| `assets-src/creatures-original-03.png` | C | 12–17 | 1.536 × 1.024 px |
+| `assets-src/creatures-original-04.png` | D | 18–23 | 1.536 × 1.024 px |
+| `assets-src/creatures-original-05.png` | E | 24–29 | 1.536 × 1.024 px |
 
 Katalogda 27 temel tür ile üç XP ödül türü bulunur. 27, 28 ve 29 numaralı türler sırasıyla öğrencinin 500, 1.500 ve 3.000 XP kazanmasıyla seçilebilir; bunların görselleri de hazırdır. Yeni örnek sınıf 24 farklı temel tür kullanır. Mevcut sınıf kayıtlarının tür ID'leri ve öğrenci seçimleri korunur.
 
@@ -114,4 +114,4 @@ Tamamlanan beş atlas tek pozlu çizimlerden oluşur. Şu anda canlıların büt
 
 30 türün statik görsel üretimi tamamlandı; dosyalar, gerçek boyutlar ve atlas ID grupları yukarıda kayıtlıdır. Ayrıntılı uzuv animasyonu üretimi henüz tamamlanmadı. Kabul kontrolü her görsel ve animasyon güncellemesinde yeniden uygulanır; bir brif maddesinin burada yer alması tek başına o davranışın uygulamada bulunduğu anlamına gelmez.
 
-Çekiçbaş köpekbalığı (ID 13), baş biçimini belirginleştirmek için ayrıca üretilen `public/assets/creature-hammerhead-original.png` dosyasını kullanır (1536 × 1024, RGBA). Üçüncü atlasın ilk çizimi dosyada korunur ancak bu türün görünümünde kullanılmaz.
+Çekiçbaş köpekbalığı (ID 13), baş biçimini belirginleştirmek için ayrıca üretilen `assets-src/creature-hammerhead-original.png` dosyasından kesilir (1536 × 1024, RGBA). Üçüncü atlasın ilk çizimi dosyada korunur ancak bu türün görünümünde kullanılmaz.

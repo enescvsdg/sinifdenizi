@@ -366,7 +366,7 @@ export default function SchoolApp() {
         <div className="welcome">
           <div
             className="welcome-art"
-            style={{ backgroundImage: `url(${asset("aquarium.png")})` }}
+            style={{ backgroundImage: `url(${asset("aquarium.webp")})` }}
           >
             <Brand />
             <div>

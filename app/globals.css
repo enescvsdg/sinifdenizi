@@ -649,21 +649,15 @@ svg {
   pointer-events: none;
   z-index: 3;
 }
-.fish-sprite {
-  display: block;
-  background-size: 400% 300%;
-  background-repeat: no-repeat;
-  width: 100px;
-  height: 100px;
-  flex-shrink: 0;
-}
+.fish-sprite,
 .decor-sprite {
   display: block;
-  background-size: 300% 300%;
-  background-repeat: no-repeat;
   width: 100px;
   height: 100px;
+  object-fit: contain;
   flex-shrink: 0;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .scene-decor {
   position: absolute;

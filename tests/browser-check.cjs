@@ -89,7 +89,7 @@ const path = require("node:path");
   await page.getByLabel("Ad soyad", { exact: true }).fill("Foto Deniz");
   await page
     .getByLabel("Profil fotoğrafı (isteğe bağlı)")
-    .setInputFiles(path.join(__dirname, "../public/assets/aquarium.png"));
+    .setInputFiles(path.join(__dirname, "../assets-src/aquarium.png"));
   await page.getByAltText("Seçilen profil fotoğrafı").waitFor();
   await page
     .getByRole("button", { name: "Öğrenciyi ekle", exact: true })

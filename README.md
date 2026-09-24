@@ -38,7 +38,7 @@ npm start
 
 ## Açık sınırlar
 
-30 türün tamamının çizimi hazırdır. Görseller `public/assets/creatures-original-01.png` ile `creatures-original-05.png` arasındaki beş adet 1.536 × 1.024 piksel RGBA atlasında yer alır. Her atlas, 3 × 2 düzende altı tür içerir. Özel türlerin seçilememesi eksik görselden değil, öğrencinin XP koşulundan kaynaklanır. Yeni çizimler mevcut deniz hareketlerini, duraklatmayı ve azaltılmış hareket tercihini korur.
+30 türün tamamının çizimi hazırdır. Ana çizimler `assets-src/creatures-original-01.png` ile `creatures-original-05.png` arasındaki beş adet 1.536 × 1.024 piksel RGBA atlasında yer alır; her atlas 3 × 2 düzende altı tür içerir. Uygulama bu atlasları yüklemez: `npm run sprites` (`scripts/build-sprites.ts`) her tür için en fazla 320 piksellik, her dekor için ayrı birer WebP dosyası ve WebP arka plan üretir. Sonuçlar `public/assets/` altına yazılır ve depoya eklenir; ilk açılış yaklaşık 1,9 MB'tır. Özel türlerin seçilememesi eksik görselden değil, öğrencinin XP koşulundan kaynaklanır. Yeni çizimler mevcut deniz hareketlerini, duraklatmayı ve azaltılmış hareket tercihini korur.
 
 Bu bir **çalışan görsel ürün demosudur**, üretim sistemi değildir. Örnek veriler tarayıcıdaki `sinifdenizi-v2` kaydında saklanır. Depolama alanı dolduğu için kaydedilemeyen bir değişiklik ekranda da geri alınır. Bu sürümün okuyamadığı bir kayıt silinmez; `sinifdenizi-v2-yedek-<tarih>` anahtarına taşınır ve örnek sınıf açılır. Gerçek kimlik doğrulama, Supabase bağlantısı, sunucuda öğretmen/veli yetkilendirmesi ve özel fotoğraf depolama henüz bağlı değildir. Rol geçişi yalnızca demo gezintisidir; güvenlik sınırı değildir. Gerçek öğrenci verileri kullanmayın. Eski prototipin kayıtları sessizce taşınmaz veya silinmez; `legacy/index.html` içinde eski prototip korunmuştur.
 
@@ -50,12 +50,14 @@ Balıklar tek pozlu 2D sprite çizimleridir. Mevcut hareket, bütün gövdenin t
 - `components/`: ekranlar, formlar, diyalog ve akvaryum.
 - `lib/model.ts`: tipler, ödüller ve ilerleme hesapları.
 - `lib/species.ts`: 30 sabit tür ID'si, katalog filtreleri ve öğrenci XP kilitleri.
-- `lib/creature-art.ts`: atlas dosyaları ve türlerin görsel alanları.
+- `lib/creature-art.ts`: çizimi hazır türler ve WebP dosyaları.
 - `lib/swimming.ts`: zamana dayalı hareket ve kaçınma motoru.
 - `lib/storage.ts`: tarayıcı kaydı, kaydedilemeyen değişikliklerin bildirimi ve okunamayan kayıtların yedeklenmesi.
 - `lib/photo.ts`: profil fotoğraflarını küçültme.
 - `lib/ids.ts`: HTTPS olmayan okul ağlarında da çalışan kimlik üretimi.
-- `public/assets/`: yeni, özgün PNG ortam ve sprite atlasları.
+- `assets-src/`: özgün PNG ana çizimler ve atlaslar (yayımlanmaz).
+- `public/assets/`: `npm run sprites` ile üretilen küçük WebP canlı, dekor ve arka plan dosyaları.
+- `scripts/build-sprites.ts`: atlaslardaki tür kırpımları ve WebP üretimi.
 - `design-reference/`: altı ana referans ve korunmuş eski iki dosya.
 - `docs/ORIGINAL_CREATURE_BRIEF.md`: özgün karakter tasarım hedefleri, atlas teslim durumu ve ileride hazırlanacak uzuv animasyonları.
 - `tests/`: ödül bütünlüğü, veri doğrulama, kayıt ve yedekleme, 40 balık testi ve tarayıcı akışları.
@@ -66,4 +68,4 @@ Uygulama 4173 portunda çalışırken `npm run test:e2e` çalıştırın. Varsay
 
 Görsel üretim yöntemi ve promptlar `ASSET_NOTES.md` içindedir.
 
-Çekiçbaş köpekbalığı (ID 13), baş biçimini belirginleştirmek için ayrıca üretilen `public/assets/creature-hammerhead-original.png` dosyasını kullanır (1536 × 1024, RGBA). Üçüncü atlasın ilk çizimi dosyada korunur ancak bu türün görünümünde kullanılmaz.
+Çekiçbaş köpekbalığı (ID 13), baş biçimini belirginleştirmek için ayrıca üretilen `assets-src/creature-hammerhead-original.png` dosyasından kesilir (1536 × 1024, RGBA). Üçüncü atlasın ilk çizimi dosyada korunur ancak bu türün görünümünde kullanılmaz.

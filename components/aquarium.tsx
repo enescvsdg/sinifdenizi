@@ -123,7 +123,7 @@ export default function Aquarium({ students, decorations, xp, onSelect, feeding 
   return (
     <div ref={root} className={`aquarium living-ocean ${compact ? "compact" : ""} ${full ? "expanded" : ""}`}
       data-motion={stopped ? "paused" : "running"}
-      style={{ backgroundImage: `url(${asset("aquarium.png")})` }}>
+      style={{ backgroundImage: `url(${asset("aquarium.webp")})` }}>
       <div className="aquarium-caption">
         <span className="live-dot" /> CANLI SINIF DENİZİ <span className="aquarium-caption-separator">/</span> {students.length} arkadaş, bir deniz
       </div>
