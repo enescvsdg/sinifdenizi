@@ -81,8 +81,9 @@ export function Activities() {
 }
 
 export function ClassGoal() {
-  const { xp } = useSchool();
-  const next = decorThresholds.findIndex((x) => x > xp);
+  const { progress } = useSchool();
+  const { next, average } = progress;
+  const xp = (value: number) => Math.floor(value).toLocaleString("tr-TR");
   return (
     <section className="card goal-card">
       <div className="section-heading">
@@ -97,17 +98,15 @@ export function ClassGoal() {
           <p>
             {next < 0
               ? "Tüm dekorların kilidi açıldı."
-              : `${(decorThresholds[next] - xp).toLocaleString("tr-TR")} XP kaldı`}
+              : `Öğrenci başına ${Math.ceil(progress.remaining)} XP kaldı`}
           </p>
         </div>
       </div>
-      <Progress value={next < 0 ? 100 : (xp / decorThresholds[next]) * 100} />
+      <Progress value={progress.fraction * 100} />
       <div className="goal-numbers">
-        <span>{xp.toLocaleString("tr-TR")} XP</span>
+        <span>Ortalama {xp(average)} XP</span>
         <span>
-          {next < 0
-            ? "Tamamlandı"
-            : `${decorThresholds[next].toLocaleString("tr-TR")} XP`}
+          {next < 0 ? "Tamamlandı" : `${xp(decorThresholds[next])} XP`}
         </span>
       </div>
       <Link className="text-button" href={paths.decor}>

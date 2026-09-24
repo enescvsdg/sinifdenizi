@@ -11,7 +11,12 @@ export const decorNames = [
   "Işıltılı denizanaları",
   "Sualtı kalesi",
 ];
-export const decorThresholds = [0, 0, 500, 1200, 2000, 3000, 4200, 5600, 7200];
+/**
+ * Average XP per student that unlocks each decoration (decorNames order).
+ * An average does not grow with class size, so a class of 15 and a class of
+ * 40 progress at the same pace.
+ */
+export const decorThresholds = [0, 0, 20, 50, 85, 125, 175, 235, 300];
 export const badges = [
   { name: "İlk adım", tasks: 1 },
   { name: "Deniz kaşifi", tasks: 5 },
@@ -69,6 +74,29 @@ export type SchoolState = {
 export const level = (xp: number) => Math.floor(xp / 500) + 1;
 export const classXp = (s: SchoolState) =>
   s.students.reduce((sum, x) => sum + x.xp, 0);
+export const averageXp = (s: SchoolState) =>
+  s.students.length ? classXp(s) / s.students.length : 0;
+/**
+ * The class's shared progress: its level is the aquarium stage (the two
+ * starting decorations are level 1), and `fraction` is the way to the next
+ * decoration.
+ */
+export function classProgress(s: SchoolState) {
+  const average = averageXp(s);
+  const unlocked = decorThresholds.filter((x) => x <= average).length;
+  const next = unlocked < decorThresholds.length ? unlocked : -1;
+  const from = decorThresholds[unlocked - 1];
+  return {
+    average,
+    unlocked,
+    level: unlocked - 1,
+    /** Index of the next decoration, or -1 once all are open. */
+    next,
+    remaining: next < 0 ? 0 : decorThresholds[next] - average,
+    fraction:
+      next < 0 ? 1 : (average - from) / (decorThresholds[next] - from),
+  };
+}
 export function participation(s: SchoolState) {
   const assigned = s.tasks.reduce((n, t) => n + t.assigned.length, 0);
   return assigned

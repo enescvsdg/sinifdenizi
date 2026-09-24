@@ -22,7 +22,7 @@ import {
   updateTask,
   removeTask,
   feedStudents,
-  classXp,
+  classProgress,
   participation,
   completedCounts,
   updateStudent,
@@ -38,7 +38,10 @@ type School = {
   state: SchoolState;
   setState: Dispatch<SetStateAction<SchoolState>>;
   notify: (text: string, tone?: Toast["tone"]) => void;
-  xp: number;
+  /** Class level and decorations, from the average XP per student. */
+  progress: ReturnType<typeof classProgress>;
+  /** Unlocked decorations the teacher placed in the aquarium. */
+  shownDecor: number[];
   completion: number;
   feed: number;
   activeTasks: number;
@@ -139,7 +142,7 @@ export function SchoolProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(t);
   }, [toast]);
 
-  const xp = classXp(state),
+  const progress = classProgress(state),
     feed = state.students.reduce((n, x) => n + x.feed, 0),
     completed = completedCounts(state);
   const current = state.students.find((x) => x.id === selected),
@@ -148,7 +151,10 @@ export function SchoolProvider({ children }: { children: ReactNode }) {
     state,
     setState,
     notify,
-    xp,
+    progress,
+    shownDecor: state.decorations.filter(
+      (i) => decorThresholds[i] <= progress.average,
+    ),
     completion: participation(state),
     feed,
     activeTasks: state.tasks.filter((t) => t.done.length < t.assigned.length)
@@ -181,7 +187,7 @@ export function SchoolProvider({ children }: { children: ReactNode }) {
       notify("Her balığın mevcut yeminden 1 yem kullanıldı. Afiyet olsun!");
     },
     toggleDecor(i) {
-      if (xp < decorThresholds[i]) return;
+      if (decorThresholds[i] > progress.average) return;
       setState((s) => ({
         ...s,
         decorations: s.decorations.includes(i)

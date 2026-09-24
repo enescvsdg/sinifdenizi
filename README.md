@@ -33,7 +33,7 @@ npm start
 - Duraklatma, azaltılmış hareket tercihi, tam ekran ve klavye ile öğrenci seçimi.
 - Öğrenci ekleme, düzenleme ve sınıftan çıkarma; arama, profil ve balık değiştirme; 40 öğrenci sınırı. Yerel fotoğraflar (en fazla 10 MB) tarayıcıda 256 × 256 piksellik küçük bir kareye dönüştürülerek saklanır.
 - Tüm sınıfa veya seçilen öğrencilere görev atama, öğrenci bazında tek seferlik onay, XP ve yem ödülleri. Onay geri alınabilir (verilen ödül aynen geri çekilir); görevler düzenlenip silinebilir (silinen görevin ödülleri geri alınır). Onayların ve etkinliklerin zamanı kaydedilir; etkinlikler "5 dk önce", "Dün" gibi gösterilir, süresi geçen görevler işaretlenir.
-- Yem harcayarak besleme; sınıf XP'sine göre dokuz dekorun açılması ve akvaryuma eklenmesi/kaldırılması.
+- Yem harcayarak besleme; öğrenci başına ortalama XP'ye göre dokuz dekorun açılması ve akvaryuma eklenmesi/kaldırılması. Ortalama sınıf büyüklüğüyle değişmediği için 15 ve 40 kişilik sınıflar aynı hızda ilerler; sınıf seviyesi akvaryumun açılan aşamasını gösterir. Her dekorun sahnede kendi sabit yeri vardır (`lib/decor-slots.ts`), birini kaldırmak diğerlerini oynatmaz.
 - Görevlerden türetilen katılım raporları, rozetler ve etkinlik akışı.
 - İki örnek çocuk arasında geçiş yapılabilen, düzenleme yapmayan veli görünümü ve öğretmen notu.
 

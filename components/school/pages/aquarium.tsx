@@ -6,11 +6,19 @@ import FishCatalog from "../../fish-catalog";
 import { Progress } from "../ui";
 import { Activities, ClassGoal, Stats } from "../widgets";
 import { useSchool } from "../state";
-import { assignStudentFish, level } from "@/lib/model";
+import { assignStudentFish } from "@/lib/model";
 import { paths } from "@/lib/routes";
 
 export function AquariumPage() {
-  const { state, setState, xp, feeding, feedAll, openProfile } = useSchool();
+  const {
+    state,
+    setState,
+    progress,
+    shownDecor,
+    feeding,
+    feedAll,
+    openProfile,
+  } = useSchool();
   return (
     <>
       <Stats />
@@ -26,18 +34,20 @@ export function AquariumPage() {
                 <p>Birlikte daha renkli, birlikte daha güzel.</p>
               </div>
             </div>
-            <div className="class-level">
+            <div
+              className="class-level"
+              title={`Öğrenci başına ortalama ${Math.floor(progress.average)} XP`}
+            >
               <Star size={18} />
               <div>
-                <strong>Seviye {level(xp)}</strong>
-                <Progress value={(xp % 500) / 5} />
+                <strong>Seviye {progress.level}</strong>
+                <Progress value={progress.fraction * 100} />
               </div>
             </div>
           </div>
           <Aquarium
             students={state.students}
-            decorations={state.decorations}
-            xp={xp}
+            decorations={shownDecor}
             onSelect={(s) => openProfile(s.id)}
             feeding={feeding}
           />

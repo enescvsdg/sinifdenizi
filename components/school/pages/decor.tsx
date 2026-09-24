@@ -5,24 +5,29 @@ import { useSchool } from "../state";
 import { decorNames, decorThresholds } from "@/lib/model";
 
 export function DecorPage() {
-  const { state, xp, toggleDecor } = useSchool();
-  const earned = decorThresholds.filter((x) => x <= xp).length;
+  const { state, progress, toggleDecor } = useSchool();
   return (
     <>
       <div className="decor-intro card">
         <div>
           <span className="eyebrow">ORTAK BAŞARI, ORTAK DENİZ</span>
           <h2>Başardıkça güzelleşir.</h2>
-          <p>Öğrencilerin kazandığı her XP, yeni bir keşfin kapısını açar.</p>
+          <p>
+            Her öğrencinin kazandığı XP sınıf ortalamasını yükseltir; ortalama
+            arttıkça yeni keşifler açılır. Kalabalık ve küçük sınıflar aynı
+            hızda ilerler.
+          </p>
           <span className="reward">
-            {xp.toLocaleString("tr-TR")} sınıf XP’si · {earned}/9 dekor açıldı
+            Öğrenci başına ortalama{" "}
+            {Math.floor(progress.average).toLocaleString("tr-TR")} XP ·{" "}
+            {progress.unlocked}/9 dekor açıldı
           </span>
         </div>
         <Decor type={8} />
       </div>
       <div className="decor-grid">
         {decorNames.map((name, i) => {
-          const unlocked = xp >= decorThresholds[i],
+          const unlocked = decorThresholds[i] <= progress.average,
             active = state.decorations.includes(i);
           return (
             <article
@@ -31,14 +36,14 @@ export function DecorPage() {
             >
               <span className={`decor-state ${unlocked ? "unlocked" : ""}`}>
                 {unlocked ? <Check size={13} /> : <Lock size={13} />}{" "}
-                {unlocked ? "Kilidi açıldı" : `${decorThresholds[i]} XP`}
+                {unlocked ? "Kilidi açıldı" : `Ort. ${decorThresholds[i]} XP`}
               </span>
               <Decor type={i} />
               <h3>{name}</h3>
               <p>
                 {i < 2
                   ? "Denizimizin ilk parçaları"
-                  : `${decorThresholds[i].toLocaleString("tr-TR")} sınıf XP’si ile açılır`}
+                  : `Öğrenci başına ortalama ${decorThresholds[i]} XP ile açılır`}
               </p>
               <button
                 className={active && unlocked ? "selected-button" : "secondary"}

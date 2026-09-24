@@ -7,6 +7,7 @@ import {
   classXp,
   validState,
   decorThresholds,
+  classProgress,
   completedCounts,
   earnedBadges,
   removeStudent,
@@ -101,11 +102,33 @@ test("feeding spends existing feed and never changes XP", () => {
 });
 test("class progression crosses a real decoration threshold after approval", () => {
   const s = initialState();
-  s.students.forEach((x) => (x.xp = 0));
-  s.students[0].xp = decorThresholds[3] - 25;
+  // Everyone just below the "Hazine sandığı" average.
+  s.students.forEach((x) => (x.xp = decorThresholds[3] - 1));
   const next = approveTask(s, s.tasks[0].id, s.students[23].id);
-  assert.ok(classXp(s) < decorThresholds[3]);
-  assert.ok(classXp(next) >= decorThresholds[3]);
+  assert.equal(classProgress(s).unlocked, 3);
+  assert.equal(classProgress(next).unlocked, 4);
+  assert.equal(classProgress(next).level, 3);
+});
+test("class progress does not depend on how many students there are", () => {
+  const s = initialState();
+  const twice = {
+    ...s,
+    students: [
+      ...s.students,
+      ...s.students.map((x) => ({ ...x, id: `${x.id}-twin` })),
+    ],
+  };
+  assert.deepEqual(classProgress(twice), classProgress(s));
+  const empty = { ...s, students: [] };
+  assert.equal(classProgress(empty).level, 1);
+  const all = {
+    ...s,
+    students: s.students.map((x) => ({ ...x, xp: 10_000 })),
+  };
+  assert.deepEqual(
+    [classProgress(all).next, classProgress(all).fraction],
+    [-1, 1],
+  );
 });
 test("local state validates malformed and unsupported saves", () => {
   assert.equal(validState(initialState()), true);

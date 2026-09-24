@@ -19,7 +19,7 @@ import { earnedBadges, level, species } from "@/lib/model";
 const linked = ["student-0", "student-1"];
 
 export function ParentPage() {
-  const { state, xp, tasksDone, openProfile } = useSchool();
+  const { state, shownDecor, tasksDone, openProfile } = useSchool();
   const [child, setChild] = useState(linked[0]);
   const children = state.students.filter((x) => linked.includes(x.id));
   const student = children.find((x) => x.id === child) || children[0];
@@ -134,8 +134,7 @@ export function ParentPage() {
         </div>
         <Aquarium
           students={[student]}
-          decorations={state.decorations}
-          xp={xp}
+          decorations={shownDecor}
           onSelect={(s) => openProfile(s.id)}
           compact
         />
