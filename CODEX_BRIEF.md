@@ -27,6 +27,7 @@ Bu altı dosya ana görsel referanslardır; yalnızca dosya adlarını veya bu b
 Dosyalardan herhangi biri eksikse veya açılamıyorsa eksik yolu açıkça bildir; tüm referanslar erişilebilir olup incelenmeden UI uygulamasına başlama. Mevcut `design-reference/reference-board.jpg` ve `design-reference/brand-guide.jpg` dosyalarını koru ve ek referans olarak incele; bunlar altı ayrı dosyanın yerine geçmez.
 
 ### Görsel uyum talimatı
+
 - Bu görseller sadece ilham değil, ürünün kabul edilmiş tasarım yönüdür.
 - Genel kompozisyon, renk dili, kart yapıları, deniz atmosferi, illüstrasyon kalitesi ve akvaryum yoğunluğu bu referanslara yakın olmalıdır.
 - Basit emoji, generic icon-only aquarium veya düz gradient kutu kullanma.
@@ -48,9 +49,11 @@ SınıfDenizi öğretmen, öğrenci profili ve veli takibini birleştiren oyunla
 ## Kullanıcı Rolleri
 
 ### 1. Öğretmen
+
 Öğretmen gerçek kullanıcı hesabına sahiptir ve sistemi yönetir.
 
 Yetkiler:
+
 - sınıf oluşturma/yönetme
 - öğrenci ekleme/düzenleme
 - öğrenci profil fotoğrafı yükleme
@@ -64,11 +67,13 @@ Yetkiler:
 - veliye gösterilecek bilgileri yönetme
 
 ### 2. Öğrenci
+
 Öğrenci için ayrı giriş hesabı OLMAYACAK.
 
 Öğrenci sistemde öğretmenin oluşturduğu bir profil kaydıdır.
 
 Her öğrenci profilinde:
+
 - ad soyad
 - profil fotoğrafı
 - sınıf
@@ -84,11 +89,13 @@ Her öğrenci profilinde:
 - balık gelişimi
 
 ### 3. Veli
+
 Veli gerçek kullanıcı hesabına sahiptir.
 
 Veli ekranı ağırlıklı olarak read-only olmalıdır.
 
 Veli görebilmeli:
+
 - kendi çocuğunun başarı durumu
 - tamamlanan görevler
 - bekleyen görevler
@@ -104,6 +111,7 @@ Aynı veli birden fazla çocuğa bağlı olabilmeli ve çocuklar arasında geçi
 ## Tasarım Yönü
 
 Tema:
+
 - profesyonel ama çocuk dostu
 - okyanus / akvaryum
 - mavi / turkuaz ana palet
@@ -112,6 +120,7 @@ Tema:
 - sıcak, güvenilir, modern
 
 Önceki marka tasarımında kullanılan yön:
+
 - SınıfDenizi logosu
 - kitap + deniz/balık metaforu
 - Nunito benzeri yuvarlak, okunabilir tipografi
@@ -124,6 +133,7 @@ Tema:
 Akvaryum ürünün merkezidir.
 
 Gereksinimler:
+
 - geniş, ferah, kalabalık sınıfta bile okunabilir
 - 25-40 öğrenci için kargaşa yaratmamalı
 - tam ekran modu olmalı
@@ -139,9 +149,11 @@ Gereksinimler:
 - seçilen balık için öğrenci profil kartı gösterilmeli
 
 ### Balık çeşitliliği
+
 Balıklar yüksek görsel kaliteye sahip özgün assetler olmalı.
 
 Örnek türler:
+
 - palyaço balığı
 - mavi tang
 - sarı tang
@@ -159,6 +171,7 @@ Balıklar yüksek görsel kaliteye sahip özgün assetler olmalı.
 ## Oyun Mekaniği
 
 Ana döngü:
+
 1. öğretmen görev verir
 2. öğrenci görevi tamamlar
 3. öğretmen onaylar
@@ -169,7 +182,9 @@ Ana döngü:
 8. akvaryuma yeni dekorasyonlar açılır
 
 ### Bireysel başarı
+
 Bireysel başarı öğrencinin balığını geliştirir:
+
 - seviye
 - görünüm
 - özel detaylar
@@ -177,9 +192,11 @@ Bireysel başarı öğrencinin balığını geliştirir:
 - rozetler
 
 ### Toplu başarı
+
 Sınıfın ortak başarısı akvaryumu geliştirir.
 
 Örnek unlock sırası:
+
 - başlangıç: sade kaya + yosun
 - renkli mercanlar
 - hazine sandığı
@@ -190,6 +207,7 @@ Sınıfın ortak başarısı akvaryumu geliştirir.
 - su altı kalesi / özel efsane dekor
 
 Toplu başarı metrikleri:
+
 - görev tamamlama oranı
 - katılım oranı
 - toplam tamamlanan görev
@@ -199,14 +217,18 @@ Toplu başarı metrikleri:
 ## Temel Ekranlar
 
 ### Giriş
+
 Ayrı seçenekler:
+
 - Öğretmen Girişi
 - Veli Girişi
 
 Öğrenci girişi YOK.
 
 ### Öğretmen Paneli
+
 Kartlar:
+
 - öğrenci sayısı
 - aktif görev
 - katılım oranı
@@ -215,12 +237,14 @@ Kartlar:
 - hızlı işlemler
 
 Hızlı işlemler:
+
 - öğrenci ekle
 - görev oluştur
 - akvaryumu aç
 - raporları gör
 
 ### Öğrenci Yönetimi
+
 - liste
 - fotoğraf
 - ad soyad
@@ -232,6 +256,7 @@ Hızlı işlemler:
 - düzenle
 
 ### Öğrenci Profili
+
 - büyük profil fotoğrafı
 - balık
 - seviye / XP barı
@@ -242,7 +267,9 @@ Hızlı işlemler:
 - gelişim geçmişi
 
 ### Görev Oluşturma
+
 Alanlar:
+
 - görev başlığı
 - açıklama
 - tür: ödev / okuma / davranış / katılım / proje / diğer
@@ -252,6 +279,7 @@ Alanlar:
 - tüm sınıfa ata / seçili öğrencilere ata
 
 ### Veli Paneli
+
 - çocuk seçici (birden fazla çocuk varsa)
 - profil fotoğrafı
 - seviye
@@ -263,6 +291,7 @@ Alanlar:
 - çocuğun balığı
 
 ### Raporlar
+
 - katılım oranı
 - görev tamamlanma
 - haftalık aktivite
@@ -281,6 +310,7 @@ Canlı demo:
 https://enescvsdg.github.io/sinifdenizi/
 
 Hedef mimari:
+
 - Next.js
 - React
 - TypeScript
@@ -291,6 +321,7 @@ Hedef mimari:
 - Row Level Security
 
 Akvaryum için öneri:
+
 - Phaser veya PixiJS veya Canvas tabanlı özel engine
 - requestAnimationFrame
 - boids / separation / wander davranışları
@@ -299,12 +330,14 @@ Akvaryum için öneri:
 ## Veri Modeli Önerisi
 
 ### users
+
 - id
 - role: teacher | parent
 - name
 - email
 
 ### classes
+
 - id
 - teacher_id
 - name
@@ -313,6 +346,7 @@ Akvaryum için öneri:
 - class_xp
 
 ### students
+
 - id
 - class_id
 - name
@@ -325,10 +359,12 @@ Akvaryum için öneri:
 - feed
 
 ### parent_student_links
+
 - parent_id
 - student_id
 
 ### tasks
+
 - id
 - class_id
 - teacher_id
@@ -340,6 +376,7 @@ Akvaryum için öneri:
 - due_date
 
 ### task_assignments
+
 - id
 - task_id
 - student_id
@@ -348,22 +385,26 @@ Akvaryum için öneri:
 - approved_at
 
 ### badges
+
 - id
 - name
 - icon
 - rule
 
 ### student_badges
+
 - student_id
 - badge_id
 - earned_at
 
 ### class_unlocks
+
 - class_id
 - unlock_key
 - unlocked_at
 
 ### announcements
+
 - id
 - class_id
 - teacher_id
@@ -376,6 +417,7 @@ Akvaryum için öneri:
 Öğrenci fotoğrafları herkese açık URL olarak servis edilmemeli.
 
 Gerekli yaklaşım:
+
 - private storage bucket
 - signed URLs
 - RLS
@@ -391,6 +433,7 @@ KVKK açısından veri minimizasyonu uygulanmalı.
 İlk `index.html` prototipi hızlı demo niteliğindeydi ve production değildi.
 
 Başlıca eksikler:
+
 - tek dosya mimarisi
 - localStorage
 - gerçek auth yok
@@ -409,6 +452,7 @@ Durum (2026-09-24): Next.js sürümünde tek dosya mimarisi yerine sayfa ve bile
 Mevcut demoyu patch'lemeye devam etmek yerine projeyi gerçek uygulama mimarisine geçir.
 
 Önerilen sıra:
+
 1. Next.js + TypeScript scaffold
 2. ortak design system
 3. Supabase schema + migrations
@@ -427,6 +471,7 @@ Mevcut demoyu patch'lemeye devam etmek yerine projeyi gerçek uygulama mimarisin
 ## Ürün Kararları — Değiştirme
 
 Aşağıdaki kararlar kullanıcı tarafından netleştirilmiştir:
+
 - ürün adı SınıfDenizi
 - slogan Öğren. Kazan. Büyüt.
 - ayrı öğrenci hesabı yok
@@ -448,6 +493,7 @@ Aşağıdaki kararlar kullanıcı tarafından netleştirilmiştir:
 Kullanıcı her küçük adımda onay vermek istemiyor.
 
 Tercih:
+
 - Codex mümkün olduğunca otonom ilerlesin
 - tasarım/teknik kararları mantıklı varsayımlarla tamamlasın
 - bitmiş veya anlamlı bir milestone sunduktan sonra revizyon alınsın

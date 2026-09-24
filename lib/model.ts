@@ -93,8 +93,7 @@ export function classProgress(s: SchoolState) {
     /** Index of the next decoration, or -1 once all are open. */
     next,
     remaining: next < 0 ? 0 : decorThresholds[next] - average,
-    fraction:
-      next < 0 ? 1 : (average - from) / (decorThresholds[next] - from),
+    fraction: next < 0 ? 1 : (average - from) / (decorThresholds[next] - from),
   };
 }
 export function participation(s: SchoolState) {
@@ -141,7 +140,9 @@ const names = [
   "Kaan Demir",
 ];
 export function initialState(): SchoolState {
-  const starterSpecies = speciesDefinitions.filter((fish) => canChooseSpecies(fish.id, 0));
+  const starterSpecies = speciesDefinitions.filter((fish) =>
+    canChooseSpecies(fish.id, 0),
+  );
   const ids = names.map((_, i) => `student-${i}`);
   const group = (member: (i: number) => boolean) =>
     ids.filter((_, i) => member(i));
@@ -403,12 +404,19 @@ export function validState(value: unknown): value is SchoolState {
   );
 }
 
-export function assignStudentFish(s: SchoolState, studentId: string, fish: number): SchoolState {
+export function assignStudentFish(
+  s: SchoolState,
+  studentId: string,
+  fish: number,
+): SchoolState {
   const student = s.students.find((entry) => entry.id === studentId);
-  if (!student || student.fish === fish || !canChooseSpecies(fish, student.xp)) return s;
+  if (!student || student.fish === fish || !canChooseSpecies(fish, student.xp))
+    return s;
   return {
     ...s,
-    students: s.students.map((entry) => entry.id === studentId ? { ...entry, fish } : entry),
+    students: s.students.map((entry) =>
+      entry.id === studentId ? { ...entry, fish } : entry,
+    ),
   };
 }
 
@@ -425,7 +433,9 @@ export function updateStudent(
     students: s.students.map((entry) => {
       if (entry.id !== studentId) return entry;
       const { photo: _previous, ...rest } = entry;
-      return changes.photo ? { ...rest, name, photo: changes.photo } : { ...rest, name };
+      return changes.photo
+        ? { ...rest, name, photo: changes.photo }
+        : { ...rest, name };
     }),
   };
 }
@@ -477,9 +487,7 @@ export function undoApproval(
         ? { ...x, done: x.done.filter((id) => id !== studentId), approvals }
         : x,
     ),
-    activities: s.activities.filter(
-      (a) => a.id !== `${taskId}-${studentId}`,
-    ),
+    activities: s.activities.filter((a) => a.id !== `${taskId}-${studentId}`),
   };
 }
 
@@ -516,6 +524,9 @@ export function updateTask(
 export function removeTask(s: SchoolState, taskId: string): SchoolState {
   const t = s.tasks.find((x) => x.id === taskId);
   if (!t) return s;
-  const undone = t.done.reduce((state, id) => undoApproval(state, taskId, id), s);
+  const undone = t.done.reduce(
+    (state, id) => undoApproval(state, taskId, id),
+    s,
+  );
   return { ...undone, tasks: undone.tasks.filter((x) => x.id !== taskId) };
 }

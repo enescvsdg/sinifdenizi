@@ -51,8 +51,8 @@ export const speciesDefinitions: readonly SpeciesDefinition[] = speciesRows.map(
 
 export const species = speciesDefinitions.map((fish) => fish.name);
 export const catalogOrder = [
-  0, 1, 2, 12, 4, 3, 5, 6, 7, 8, 9, 13, 14, 15, 16,
-  17, 11, 18, 10, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+  0, 1, 2, 12, 4, 3, 5, 6, 7, 8, 9, 13, 14, 15, 16, 17, 11, 18, 10, 19, 20, 21,
+  22, 23, 24, 25, 26, 27, 28, 29,
 ];
 export const speciesFilters = [
   { id: "all", label: "Tümü" },
@@ -68,17 +68,27 @@ export function canChooseSpecies(id: number, xp: number): boolean {
 
 export function isSpeciesUnlocked(id: number, xp: number): boolean {
   const fish = speciesDefinitions[id];
-  return Number.isInteger(id) && !!fish && Number.isFinite(xp) && xp >= fish.unlockXp;
+  return (
+    Number.isInteger(id) && !!fish && Number.isFinite(xp) && xp >= fish.unlockXp
+  );
 }
 
 function searchKey(text: string) {
-  return text.toLocaleLowerCase("tr-TR").normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "").replace(/ı/g, "i").trim();
+  return text
+    .toLocaleLowerCase("tr-TR")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ı/g, "i")
+    .trim();
 }
 
 export function filterSpecies(filter: SpeciesFilter = "all", query = "") {
   const key = searchKey(query);
-  return catalogOrder.map((id) => speciesDefinitions[id]).filter((fish) =>
-    (filter === "all" || fish.category === filter) && searchKey(fish.name).includes(key),
-  );
+  return catalogOrder
+    .map((id) => speciesDefinitions[id])
+    .filter(
+      (fish) =>
+        (filter === "all" || fish.category === filter) &&
+        searchKey(fish.name).includes(key),
+    );
 }
