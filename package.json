@@ -16,7 +16,8 @@
     "format:check": "prettier --check .",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
     "test:e2e": "node tests/browser-check.cjs",
-    "sprites": "node --experimental-strip-types scripts/build-sprites.ts"
+    "sprites": "node --experimental-strip-types scripts/build-sprites.ts",
+    "share-image": "node scripts/build-share-image.cjs"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.3.0",
